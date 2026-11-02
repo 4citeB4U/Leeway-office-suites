@@ -1,0 +1,6 @@
+{
+  "name": "LeeWay Office Suites - Agent Tablet",
+  "description": "Governed office suite combining LibreOffice core capabilities and Open Notebook source-grounded research into the LeeWay Agent Tablet interface adhering to LeeWay Standards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

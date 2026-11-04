@@ -39,7 +39,7 @@ export const ContinuumModal: React.FC<ContinuumModalProps> = ({
     { name: '1. Continuity', desc: 'Unbroken session memory across all 9 suite modules', color: 'border-cyan-400 text-cyan-300' },
     { name: '2. Context', desc: 'Tri-tier memory: Episodic, Semantic vectors, Procedural', color: 'border-blue-400 text-blue-300' },
     { name: '3. Formula', desc: 'Deterministic transformation logic & prompt atom templates', color: 'border-emerald-400 text-emerald-300' },
-    { name: '4. Capability', desc: 'LibreOffice core engines + Open Notebook source grounding', color: 'border-yellow-400 text-yellow-300' },
+    { name: '4. Capability', desc: 'LeeWay Office engines + Open Notebook source grounding', color: 'border-yellow-400 text-yellow-300' },
     { name: '5. Runtime', desc: 'Sovereign agent execution with zero unverified external APIs', color: 'border-orange-400 text-orange-300' },
     { name: '6. Veritas', desc: 'Cryptographic compliance verification & paged source citations', color: 'border-purple-400 text-purple-300' },
     { name: '7. Receipt', desc: 'Immutable audit hashes for every generation action', color: 'border-pink-400 text-pink-300' },

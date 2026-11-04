@@ -17,11 +17,11 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * LeeWay Office Suites — Agent Tablet
- * Unifying LibreOffice Core Engine & Open Notebook Grounded Synthesis
+ * Unifying browser-local Office authoring & Open Notebook Grounded Synthesis
  * Governed by LeeWay Standards Architecture (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TabletFrame } from './leeway/components/TabletFrame';
 import { OfficeSuitesBanner } from './leeway/components/OfficeSuitesBanner';
 import { UnifiedSuiteSidebar } from './leeway/components/UnifiedSuiteSidebar';
@@ -55,12 +55,24 @@ import {
   TransformResult
 } from './leeway/types';
 import { INITIAL_SOURCES } from './leeway/data/defaultSources';
-import { generateVeritasReceipt } from './leeway/governance/leewayCompliance';
+import { createGroundedTransform } from './leeway/groundedTransforms';
 
 export default function App() {
   const [activeModule, setActiveModule] = useState<SuiteModuleId>('pdf');
   const [activeDockTab, setActiveDockTab] = useState<SystemDockId>('office');
-  const [sources, setSources] = useState<GroundedSource[]>(INITIAL_SOURCES);
+  const [sources, setSources] = useState<GroundedSource[]>(() => {
+    if (typeof window === 'undefined') return INITIAL_SOURCES;
+    try {
+      const stored = window.localStorage.getItem('leeway-office-sources-v1');
+      if (stored) {
+        const parsed = JSON.parse(stored) as GroundedSource[];
+        if (Array.isArray(parsed) && parsed.every((source) => source && typeof source.id === 'string' && typeof source.title === 'string')) return parsed;
+      }
+    } catch {
+      // Use the shipped source set when browser storage is unavailable or invalid.
+    }
+    return INITIAL_SOURCES;
+  });
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [transformResult, setTransformResult] = useState<TransformResult | null>(null);
   const [groundedAskAction, setGroundedAskAction] = useState<GroundedActionId | null>(null);
@@ -83,6 +95,14 @@ export default function App() {
   // Cross-module doc editor sync
   const [documentContent, setDocumentContent] = useState<string>('');
 
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('leeway-office-sources-v1', JSON.stringify(sources));
+    } catch {
+      // Source work remains usable in browsers that block local storage.
+    }
+  }, [sources]);
+
   const handleToggleSource = (sourceId: string) => {
     setSources((prev) =>
       prev.map((s) => (s.id === sourceId ? { ...s, checked: !s.checked } : s))
@@ -97,62 +117,11 @@ export default function App() {
     setSources((prev) => prev.filter((s) => s.id !== sourceId));
   };
 
-  const handleExecuteTransform = async (transformType: TransformActionId) => {
+  const handleExecuteTransform = (transformType: TransformActionId) => {
     setIsGenerating(true);
     const activeSources = sources.filter((s) => s.checked);
-
-    try {
-      const response = await fetch('/api/transform', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transformType,
-          sources: activeSources
-        })
-      });
-
-      if (!response.ok) throw new Error('Transform request failed');
-      const data = await response.json();
-
-      setTransformResult({
-        transformType,
-        content: data.result,
-        veritas: data.veritas || generateVeritasReceipt(transformType, activeSources.length),
-        sourcesUsed: activeSources.map((s) => s.title)
-      });
-    } catch (err) {
-      console.warn('API transform error, generating verified local output:', err);
-      const veritas = generateVeritasReceipt(transformType, activeSources.length);
-      const fallbackText = `# ${transformType.toUpperCase()}: LeeWay Project Synthesis
-[Source 1: LeeWay Project Report.pdf, p. 1-2 | Source 2: Integration Plan.docx, p. 3]
-
-## Core Grounded Insights
-- Integration Layer: 92% complete across LibreOffice suite modules [Source 1, p. 2].
-- Workforce Onboarding: Phase 2 currently active with 88% adoption [Source 3, p. 1].
-- Knowledge Base: 42 verified resources actively indexed [Source 1, p. 2].
-- Continuous Veritas Verification attestation verified.`;
-
-      setTransformResult({
-        transformType,
-        content: fallbackText,
-        veritas,
-        sourcesUsed: activeSources.map((s) => s.title)
-      });
-      // Seamlessly route into the unified system module
-      if (transformType === 'Slide Deck') {
-        setActiveModule('presentations');
-      } else if (transformType === 'Data Table') {
-        setActiveModule('spreadsheets');
-      } else if (transformType === 'Reports' || transformType === 'Summary') {
-        setActiveModule('documents');
-      } else if (transformType === 'Mind Map') {
-        setActiveModule('draw');
-      } else if (transformType === 'Audio Overview' || transformType === 'Flashcards' || transformType === 'Quiz') {
-        setActiveModule('research');
-      }
-    } finally {
-      setIsGenerating(false);
-    }
+    setTransformResult(createGroundedTransform(transformType, activeSources));
+    setIsGenerating(false);
   };
 
   const handleExecuteGroundedAction = (actionType: GroundedActionId) => {
@@ -209,7 +178,7 @@ export default function App() {
 
             {activeModule === 'presentations' && <PresentationsModule />}
 
-            {activeModule === 'draw' && <DrawModule />}
+            {activeModule === 'draw' && <DrawModule sources={sources.filter((source) => source.checked)} />}
 
             {activeModule === 'research' && (
               <ResearchNotebookModule sources={sources} />
@@ -265,7 +234,6 @@ export default function App() {
       <TransformResultModal
         result={transformResult}
         onClose={() => setTransformResult(null)}
-        onInsertIntoDoc={handleInsertIntoDoc}
       />
 
       <GroundedAskModal

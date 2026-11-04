@@ -35,6 +35,7 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
   onClose
 }) => {
   if (!isOpen) return null;
+  const overallScore = Math.round(INITIAL_COMPLIANCE_CHECKS.reduce((total, check) => total + check.score, 0) / INITIAL_COMPLIANCE_CHECKS.length);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
@@ -66,15 +67,15 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs text-slate-400 block font-mono">SOVEREIGN COMPLIANCE SCORE</span>
-              <span className="text-2xl font-black text-emerald-400 tracking-tight">99.4%</span>
+              <span className="text-xs text-slate-400 block font-mono">MEASURED CLIENT SCORE</span>
+              <span className="text-2xl font-black text-emerald-400 tracking-tight">{overallScore}%</span>
             </div>
           </div>
 
           <div className="flex flex-col text-right text-[11px] font-mono text-slate-400">
-            <span>Runtime: Sovereign Linux (Node 22 / React 19)</span>
-            <span>Security Level: FabricPASS L4 Attested</span>
-            <span>Zero-Drift: Enforced</span>
+            <span>Runtime: Browser client (React / Vite)</span>
+            <span>External AI provider: Not required</span>
+            <span>Receipt mode: Deterministic metadata</span>
           </div>
         </div>
 
@@ -90,7 +91,7 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
               className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start justify-between gap-4"
             >
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                {check.status === 'PASS' ? <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /> : <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />}
                 <div>
                   <div className="flex items-center gap-2">
                     <h4 className="text-xs font-semibold text-white">{check.name}</h4>
@@ -105,7 +106,7 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
               </div>
 
               <div className="text-right font-mono text-xs">
-                <span className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-bold">
+                <span className={`px-2 py-0.5 rounded font-bold ${check.status === 'PASS' ? 'bg-emerald-950 border border-emerald-800 text-emerald-300' : 'bg-amber-950 border border-amber-800 text-amber-300'}`}>
                   {check.status} ({check.score}%)
                 </span>
               </div>

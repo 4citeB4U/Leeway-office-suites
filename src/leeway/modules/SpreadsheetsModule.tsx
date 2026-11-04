@@ -16,10 +16,10 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
- * Spreadsheets Module (LibreOffice Calc Core Engine)
+ * Spreadsheets Module (LeeWay Calc browser workspace)
  * Fully interactive spreadsheet with inline cell editing, multi-sheet tabs,
  * real formula execution (=SUM, =AVERAGE, =COUNT, =MAX, =MIN, =IF, =PRODUCT),
- * file import (.xlsx, .ods, .csv), and real C++ backend exports.
+ * file import (.xlsx, .ods, .csv), and browser-local Office-compatible exports.
  * Governed by LeeWay Standards Architecture (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
@@ -46,6 +46,7 @@ import {
   FileUp
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { createSpreadsheetBlob, downloadBlob } from '../officeExports';
 
 interface CellFormatting {
   bold?: boolean;
@@ -482,7 +483,23 @@ export const SpreadsheetsModule: React.FC = () => {
     e.target.value = '';
   };
 
-  // Real File Export (.ods, .xlsx, .csv)
+  const createNewWorkbook = () => {
+    const blankSheet: SheetContent = {
+      id: `sheet-${Date.now()}`,
+      name: 'Sheet1',
+      rowCount: 20,
+      colCount: 7,
+      formatting: { A1: { bold: true } },
+      data: { A1: 'Column 1', B1: 'Column 2', C1: 'Column 3' }
+    };
+    setSheets([blankSheet]);
+    setActiveSheetId(blankSheet.id);
+    setSelectedCell('A1');
+    setNotice('New blank workbook created');
+    setTimeout(() => setNotice(null), 2500);
+  };
+
+  // Browser-local Office-compatible file export (.ods, .xlsx, .csv)
   const handleExport = async (format: 'ods' | 'xlsx' | 'csv') => {
     setIsExporting(format);
     try {
@@ -500,34 +517,10 @@ export const SpreadsheetsModule: React.FC = () => {
         if (hasData || r <= 10) gridMatrix.push(rowArr);
       }
 
-      const res = await fetch('/api/libreoffice/calc/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sheetName: currentSheet.name,
-          gridRows: gridMatrix,
-          format
-        })
-      });
-
-      const json = await res.json();
-      if (!json.success || !json.data) throw new Error(json.error || 'Export failed');
-
-      const byteCharacters = atob(json.data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: json.mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = json.filename;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      setNotice(`Exported ${json.filename} with Veritas Seal [${json.veritasReceipt?.hash || 'OK'}]`);
+      const blob = createSpreadsheetBlob(currentSheet.name, gridMatrix, format);
+      const filename = `${currentSheet.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.${format}`;
+      downloadBlob(blob, filename);
+      setNotice(`Saved ${filename} locally from LeeWay Calc`);
       setTimeout(() => setNotice(null), 3500);
     } catch (err: any) {
       alert('Spreadsheet export failed: ' + err.message);
@@ -538,7 +531,7 @@ export const SpreadsheetsModule: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-950/80 overflow-hidden select-none border border-cyan-500/20 rounded-2xl shadow-2xl">
-      {/* 1. Ribbon Bar: LibreOffice Calc Engine & Actions */}
+      {/* 1. Ribbon Bar: LeeWay Calc & Actions */}
       <div className="flex items-center justify-between px-3 py-2 bg-slate-900/95 border-b border-cyan-500/20 shrink-0 flex-wrap gap-2">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
@@ -551,11 +544,11 @@ export const SpreadsheetsModule: React.FC = () => {
               </h2>
               <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono bg-emerald-950/90 px-1.5 py-0.5 rounded border border-emerald-800/60">
                 <Cpu className="w-2.5 h-2.5 text-emerald-400 animate-pulse" />
-                LibreOffice Core v7.4.7.2
+                Browser-local spreadsheet engine
               </span>
             </div>
             <p className="text-[9px] text-slate-400 font-mono">
-              OASIS OpenDocument Spreadsheet Engine • Real Inline Cell Editing
+              Office-compatible workbook • Real inline cell editing
             </p>
           </div>
         </div>
@@ -578,13 +571,21 @@ export const SpreadsheetsModule: React.FC = () => {
             <Upload className="w-3 h-3 text-cyan-400" />
             <span>Import</span>
           </button>
+          <button
+            onClick={createNewWorkbook}
+            className="flex items-center gap-1 rounded bg-emerald-950/90 px-2 py-1 text-xs font-semibold text-emerald-300 transition-colors hover:bg-emerald-900"
+            title="Create a new blank workbook"
+          >
+            <Plus className="h-3 w-3" />
+            <span>New Workbook</span>
+          </button>
 
-          {/* Export to .ODS (LibreOffice Calc) */}
+          {/* Export to .ODS */}
           <button
             onClick={() => handleExport('ods')}
             disabled={isExporting !== null}
             className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-500/60 text-xs font-semibold text-emerald-300 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-            title="Export native LibreOffice Calc (.ods) file"
+            title="Download an Office-compatible OpenDocument spreadsheet"
           >
             <FileSpreadsheet className="w-3 h-3" />
             <span>{isExporting === 'ods' ? 'Saving...' : 'Export .ODS'}</span>
@@ -847,7 +848,7 @@ export const SpreadsheetsModule: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. Sheet Tabs Bar (LibreOffice Style) */}
+      {/* 5. Sheet Tabs Bar */}
       <div className="flex items-center justify-between px-3 py-1 bg-slate-950 border-t border-slate-800/90 text-xs shrink-0 select-none">
         <div className="flex items-center gap-1 overflow-x-auto py-0.5">
           {sheets.map((s) => (

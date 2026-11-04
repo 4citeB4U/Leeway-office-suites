@@ -16,10 +16,10 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
- * Presentations Module (LibreOffice Impress Core Engine)
+ * Presentations Module (LeeWay Impress browser workspace)
  * Fully interactive slide deck creation and editing with slide filmstrip,
  * layout switcher, inline text editing, speaker notes, live slide show,
- * and real C++ backend export to .odp (OpenDocument Presentation), .pptx, and .pdf.
+ * and browser-local export to .odp, HTML slide decks, and PDF handouts.
  * Governed by LeeWay Standards Architecture (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
@@ -45,6 +45,7 @@ import {
   MessageSquare,
   Sparkles
 } from 'lucide-react';
+import { createHtmlDeckBlob, createOdpBlob, createPdfBlob, downloadBlob } from '../officeExports';
 
 export type SlideLayout = 'title' | 'bullets' | 'twoColumn' | 'metric' | 'quote';
 export type SlideTheme = 'sovereign' | 'slate' | 'emerald' | 'purple';
@@ -69,7 +70,7 @@ const DEFAULT_SLIDES: SlideData[] = [
     subtitle: 'Create • Edit • Research • Analyze • Present',
     layout: 'title',
     bullets: [
-      'Unification of LibreOffice Productivity & Open Notebook Grounding',
+      'Unification of LeeWay Office authoring & Open Notebook grounding',
       'Autonomous Agent Tablet Form Factor with Sovereign Hardware Bezel',
       'Governed strictly by LeeWay Standards Architecture v2026.4',
       'Veritas Attestation & Real-Time Source Citations'
@@ -251,43 +252,34 @@ export const PresentationsModule: React.FC = () => {
     }
   };
 
-  // Real Export via LibreOffice Impress backend
-  const handleExport = async (format: 'odp' | 'pptx' | 'pdf') => {
+  const createNewDeck = () => {
+    setSlides([{
+      id: `slide-${Date.now()}`,
+      title: 'Untitled presentation',
+      subtitle: 'Created in LeeWay Impress',
+      layout: 'title',
+      bullets: ['Add your first source-grounded point'],
+      notes: ''
+    }]);
+    setActiveSlideIndex(0);
+    setNotice('New blank slide deck created');
+    setTimeout(() => setNotice(null), 2500);
+  };
+
+  // Browser-local Office-compatible presentation export.
+  const handleExport = async (format: 'odp' | 'html' | 'pdf') => {
     setIsExporting(format);
     try {
-      const res = await fetch('/api/libreoffice/impress/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: slides[0]?.title || 'Presentation',
-          slides: slides.map((s) => ({
-            title: s.title,
-            subtitle: s.subtitle,
-            bullets: s.layout === 'twoColumn' ? [...s.bullets, ...(s.secondaryBullets || [])] : s.bullets,
-            notes: s.notes
-          })),
-          format
-        })
-      });
-
-      const json = await res.json();
-      if (!json.success || !json.data) throw new Error(json.error || 'Export failed');
-
-      const byteCharacters = atob(json.data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: json.mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = json.filename;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      setNotice(`Exported ${json.filename} with Veritas Seal [${json.veritasReceipt?.hash || 'OK'}]`);
+      const exportSlides = slides.map((slide) => ({ ...slide, bullets: slide.layout === 'twoColumn' ? [...slide.bullets, ...(slide.secondaryBullets || [])] : slide.bullets }));
+      const title = slides[0]?.title || 'LeeWay presentation';
+      const blob = format === 'odp'
+        ? await createOdpBlob(title, exportSlides)
+        : format === 'html'
+          ? createHtmlDeckBlob(title, exportSlides)
+          : await createPdfBlob(title, exportSlides.map((slide) => `${slide.title}\n${slide.subtitle}\n${slide.bullets.map((bullet) => `• ${bullet}`).join('\n')}`).join('\n\n'));
+      const filename = `${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.${format}`;
+      downloadBlob(blob, filename);
+      setNotice(`Saved ${filename} locally from LeeWay Impress`);
       setTimeout(() => setNotice(null), 3500);
     } catch (err: any) {
       alert('Presentation export failed: ' + err.message);
@@ -313,7 +305,7 @@ export const PresentationsModule: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-950/80 overflow-hidden select-none border border-cyan-500/20 rounded-2xl shadow-2xl relative">
-      {/* 1. Header Ribbon: LibreOffice Impress Engine & Slide Controls */}
+      {/* 1. Header Ribbon: LeeWay Impress & Slide Controls */}
       <div className="flex items-center justify-between px-3 py-2 bg-slate-900/95 border-b border-cyan-500/20 shrink-0 flex-wrap gap-2">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-rose-950/80 border border-rose-500/50 text-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.3)]">
@@ -326,11 +318,11 @@ export const PresentationsModule: React.FC = () => {
               </h2>
               <span className="flex items-center gap-1 text-[9px] text-rose-400 font-mono bg-rose-950/90 px-1.5 py-0.5 rounded border border-rose-800/60">
                 <Cpu className="w-2.5 h-2.5 text-rose-400 animate-pulse" />
-                LibreOffice Impress v7.4.7.2
+                Browser-local presentation engine
               </span>
             </div>
             <p className="text-[9px] text-slate-400 font-mono">
-              OASIS OpenDocument Presentation Engine • Real Slide Authoring
+              Office-compatible slide authoring • Real editable deck
             </p>
           </div>
         </div>
@@ -346,27 +338,35 @@ export const PresentationsModule: React.FC = () => {
             <Play className="w-3.5 h-3.5 fill-current" />
             <span>Slide Show</span>
           </button>
+          <button
+            onClick={createNewDeck}
+            className="flex items-center gap-1 rounded bg-rose-950/90 px-2.5 py-1 text-xs font-semibold text-rose-300 transition-colors hover:bg-rose-900"
+            title="Create a new blank slide deck"
+          >
+            <Plus className="h-3 w-3" />
+            <span>New Deck</span>
+          </button>
 
           {/* Export to .ODP */}
           <button
             onClick={() => handleExport('odp')}
             disabled={isExporting !== null}
             className="flex items-center gap-1 px-2.5 py-1 rounded bg-rose-950/90 hover:bg-rose-900 border border-rose-500/60 text-xs font-semibold text-rose-300 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-            title="Export authentic LibreOffice Impress (.odp) presentation"
+            title="Export an Office-compatible OpenDocument presentation"
           >
             <FileCode className="w-3 h-3" />
             <span>{isExporting === 'odp' ? 'Exporting...' : 'Export .ODP'}</span>
           </button>
 
-          {/* Export to .PPTX */}
+          {/* Export to browser slide deck HTML */}
           <button
-            onClick={() => handleExport('pptx')}
+            onClick={() => handleExport('html')}
             disabled={isExporting !== null}
             className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-            title="Export Microsoft PowerPoint (.pptx)"
+            title="Download a portable HTML slide deck"
           >
             <Download className="w-3 h-3" />
-            <span>.PPTX</span>
+            <span>.HTML</span>
           </button>
 
           {/* Export to .PDF */}

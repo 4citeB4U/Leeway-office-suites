@@ -16,13 +16,13 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
- * Research Notebook Module (Open Notebook / NotebookLM Engine)
+ * Research Notebook Module (LeeWay Open Notebook Engine)
  * Source-grounded research, conversational query, note synthesis,
  * and real interactive two-host Audio Overview Podcast player (Alex & Morgan).
  * Governed by LeeWay Standards (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   BookOpen,
   Send,
@@ -42,6 +42,7 @@ import {
   FileText
 } from 'lucide-react';
 import { GroundedSource } from '../types';
+import { answerFromSources, makeDialogue, searchSources } from '../groundedTransforms';
 
 interface ResearchNotebookModuleProps {
   sources: GroundedSource[];
@@ -81,32 +82,13 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
   sources
 }) => {
   const [activeTab, setActiveTab] = useState<'chat' | 'audio' | 'search'>('chat');
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'm1',
-      sender: 'agent',
-      text: 'Welcome to your Open Notebook Grounded Workspace. I am actively indexed against your 3 active sources. What insights, cross-document comparisons, or synthesized briefs would you like to explore today?',
-      timestamp: '10:20 AM',
-      veritasHash: 'LW-VERITAS-BOOT-1'
-    },
-    {
-      id: 'm2',
-      sender: 'user',
-      text: 'What are the core conclusions and progress figures in the latest Project Report?',
-      timestamp: '10:21 AM'
-    },
-    {
-      id: 'm3',
-      sender: 'agent',
-      text: 'Based on your grounded documents [Source 1: LeeWay Project Report.pdf, p. 2], the integration project is advancing ahead of schedule:\n\n1. **Integration Layer**: 92% complete across LibreOffice writer, calc, impress, draw, and PDF annotator [Source 1, p. 2].\n2. **Workforce Onboarding**: Phase 2 currently active across pilot business units with 88% adoption rate [Source 1, p. 2; Source 3, p. 1].\n3. **Knowledge Base**: Expanded with 42 newly cataloged resources indexed into the vector core [Source 1, p. 2].\n4. **Key Outcomes**: Documented gains in cross-team productivity (+34%) and knowledge coverage [Source 1, p. 3].',
-      citations: [
-        { sourceTitle: 'LeeWay Project Report.pdf', pageNumber: 2, quote: 'Integration layer: 92% complete' },
-        { sourceTitle: 'Workforce Brief.pdf', pageNumber: 1, quote: 'Phase 2 deployment active across pilot business units.' }
-      ],
-      timestamp: '10:21 AM',
-      veritasHash: 'LW-VERITAS-REP-92'
-    }
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [{
+    id: 'welcome',
+    sender: 'agent',
+    text: `Welcome to the LeeWay grounded notebook. I am ready to work from ${sources.filter((source) => source.checked).length} selected source${sources.filter((source) => source.checked).length === 1 ? '' : 's'}. Ask a question or create an audio overview.`,
+    timestamp: 'Ready',
+    veritasHash: 'LW-GROUNDING-READY'
+  }]);
 
   const [inputQuestion, setInputQuestion] = useState('');
   const [isAsking, setIsAsking] = useState(false);
@@ -126,34 +108,35 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
 
   const activeSources = sources.filter((s) => s.checked);
 
-  // Load podcast episode on mount or when requested
-  const loadAudioOverview = async () => {
+  // Build the audio overview locally so the static GitHub Pages deployment remains usable.
+  const loadAudioOverview = useCallback(() => {
     setIsLoadingAudio(true);
-    try {
-      const res = await fetch('/api/notebook/audio-overview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sources: activeSources.map((s) => ({ title: s.title, content: s.content }))
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.episode) {
-        setEpisode(data.episode);
-        setCurrentTurnIndex(0);
-      }
-    } catch (err) {
-      console.warn('Audio overview fetch error:', err);
-    } finally {
-      setIsLoadingAudio(false);
-    }
-  };
+    const dialogue = makeDialogue(activeSources).map((turn, index) => ({
+      ...turn,
+      id: `turn-${index + 1}`,
+      tone: turn.speaker === 'Alex' ? 'Analytical' : 'Narrative',
+      seconds: index === 0 ? 0 : index === 1 ? 12 : 35
+    }));
+    setEpisode({
+      id: `episode-${activeSources.length}`,
+      title: 'LeeWay Source Audio Overview',
+      subtitle: `${activeSources.length} selected source${activeSources.length === 1 ? '' : 's'} • Browser-local playback`,
+      durationFormatted: '00:45',
+      totalSeconds: 45,
+      dialogue,
+      veritasHash: `LW-GROUNDING-AUDIO-${activeSources.length}`,
+      summary: activeSources.map((source) => source.summary).join(' ')
+    });
+    setCurrentTurnIndex(0);
+    setIsLoadingAudio(false);
+  }, [sources]);
 
   useEffect(() => {
-    if (!episode) {
-      loadAudioOverview();
-    }
-  }, []);
+    loadAudioOverview();
+    setMessages((previous) => previous.map((message, index) => index === 0
+      ? { ...message, text: `Welcome to the LeeWay grounded notebook. I am ready to work from ${activeSources.length} selected source${activeSources.length === 1 ? '' : 's'}. Ask a question or create an audio overview.` }
+      : message));
+  }, [loadAudioOverview, activeSources.length]);
 
   // Browser Web Speech API Speech Synthesis for Real Audio Playback
   useEffect(() => {
@@ -208,7 +191,7 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!inputQuestion.trim()) return;
 
     const currentQ = inputQuestion;
@@ -222,61 +205,24 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
     setMessages((prev) => [...prev, userMsg]);
     setIsAsking(true);
 
-    try {
-      const response = await fetch('/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: currentQ,
-          sources: activeSources
-        })
-      });
-      const data = await response.json();
-
-      const agentMsg: ChatMessage = {
-        id: 'm-' + (Date.now() + 1),
-        sender: 'agent',
-        text: data.answer || 'Answer generated from active documents.',
-        citations: data.citations || [
-          { sourceTitle: 'LeeWay Project Report.pdf', pageNumber: 2, quote: 'Integration layer: 92% complete' }
-        ],
-        timestamp: 'Just now',
-        veritasHash: data.veritasHash || 'LW-VERITAS-ASK'
-      };
-      setMessages((prev) => [...prev, agentMsg]);
-    } catch {
-      const fallbackMsg: ChatMessage = {
-        id: 'm-' + (Date.now() + 1),
-        sender: 'agent',
-        text: `According to LeeWay Project Report.pdf [Source 1, p. 2], the integration layer is 92% complete, and 42 knowledge resources are actively indexed. Workforce onboarding is progressing in Phase 2.`,
-        citations: [
-          { sourceTitle: 'LeeWay Project Report.pdf', pageNumber: 2, quote: 'Integration layer: 92% complete' }
-        ],
-        timestamp: 'Just now',
-        veritasHash: 'LW-VERITAS-FALLBACK'
-      };
-      setMessages((prev) => [...prev, fallbackMsg]);
-    } finally {
-      setIsAsking(false);
-    }
+    const answer = answerFromSources(currentQ, activeSources);
+    const agentMsg: ChatMessage = {
+      id: 'm-' + (Date.now() + 1),
+      sender: 'agent',
+      text: answer.text,
+      citations: answer.citations,
+      timestamp: 'Just now',
+      veritasHash: 'LW-GROUNDING-ASK'
+    };
+    setMessages((prev) => [...prev, agentMsg]);
+    setIsAsking(false);
   };
 
-  const handleSemanticSearch = async () => {
+  const handleSemanticSearch = () => {
     if (!searchQuery.trim()) return;
     setIsSearching(true);
-    try {
-      const res = await fetch('/api/notebook/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery, topK: 5 })
-      });
-      const data = await res.json();
-      setSearchResults(data.matches || []);
-    } catch (err) {
-      console.warn('Search query error:', err);
-    } finally {
-      setIsSearching(false);
-    }
+    setSearchResults(searchSources(searchQuery, activeSources));
+    setIsSearching(false);
   };
 
   return (
@@ -295,7 +241,7 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-mono">
-              Self-Hosted NotebookLM Alternative • Strict Source Citations
+              LeeWay source grounding • Strict source citations
             </p>
           </div>
         </div>
@@ -405,6 +351,8 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
               />
               <button
                 onClick={handleSendMessage}
+                aria-label="Ask selected sources"
+                title="Ask selected sources"
                 disabled={!inputQuestion.trim() || isAsking}
                 className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0"
               >
@@ -413,13 +361,13 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
             </div>
             <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono mt-1.5 px-1">
               <span>Anchored against {activeSources.length} active documents</span>
-              <span>Open Notebook Grounding • Zero Hallucination Mode</span>
+              <span>Browser-local grounding • Source citations attached</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* VIEW 2: NotebookLM-Style Audio Overview Podcast */}
+      {/* VIEW 2: Source-grounded Audio Overview */}
       {activeTab === 'audio' && (
         <div className="flex-1 flex flex-col overflow-hidden p-4">
           {/* Podcast Player Banner */}
@@ -459,6 +407,7 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
                     setCurrentTurnIndex(0);
                     setIsPlayingAudio(true);
                   }}
+                  aria-label="Restart audio overview"
                   className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white cursor-pointer"
                   title="Restart Episode"
                 >
@@ -561,6 +510,7 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
             />
             <button
               onClick={handleSemanticSearch}
+              aria-label="Search selected sources"
               disabled={isSearching || !searchQuery.trim()}
               className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-colors cursor-pointer"
             >
@@ -593,7 +543,7 @@ export const ResearchNotebookModule: React.FC<ResearchNotebookModuleProps> = ({
 
             {searchResults.length === 0 && !isSearching && (
               <div className="py-12 text-center text-slate-500 text-xs">
-                Enter a query above to inspect token chunks extracted by the Open Notebook engine.
+                Enter a query above to inspect passages extracted from the selected sources.
               </div>
             )}
           </div>

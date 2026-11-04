@@ -52,7 +52,7 @@ The integration project continues to make strong progress, with key milestones o
     checked: true,
     content: `Integration Plan for LeeWay Office Suites and Open Notebook Core.
 Scope:
-- Unified workspace embedding LibreOffice core engines (Writer, Calc, Impress, Draw) with Open Notebook research grounding.
+- Unified browser workspace embedding LeeWay Writer, Calc, Impress, and Canvas capabilities with Open Notebook research grounding.
 - Zero-latency context preservation following the LeeWay Continuum pipeline.
 - Real-time token citations and Veritas receipt hashing on every synthesis action.
 - Milestones 1 through 4 completed. Milestone 5 (Enterprise federation) scheduled for next quarter.`,
@@ -79,7 +79,7 @@ Key Metrics:
 
 export const INITIAL_KNOWLEDGE_BASE_ITEMS = [
   { id: 'kb-1', title: 'LeeWay Standards Architecture Whitepaper v2026.4', category: 'Standards', pages: 24, date: '2025-01-20' },
-  { id: 'kb-2', title: 'LibreOffice Core C++ Integration Guidelines', category: 'Architecture', pages: 32, date: '2025-01-18' },
+  { id: 'kb-2', title: 'LeeWay Office Core Integration Guidelines', category: 'Architecture', pages: 32, date: '2025-01-18' },
   { id: 'kb-3', title: 'Open Notebook Grounded Model Synthesis Spec', category: 'Research', pages: 18, date: '2025-01-22' },
   { id: 'kb-4', title: 'FabricPASS Cryptographic Validation Framework', category: 'Security', pages: 14, date: '2025-01-15' },
   { id: 'kb-5', title: 'Continuum Context Pipeline: 8-Stage Lifecycle', category: 'Continuum', pages: 20, date: '2025-01-19' },

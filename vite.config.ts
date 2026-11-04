@@ -5,6 +5,8 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // GitHub Pages project sites serve assets under the repository prefix.
+    base: process.env.GITHUB_ACTIONS === 'true' ? '/Leeway-office-suites/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

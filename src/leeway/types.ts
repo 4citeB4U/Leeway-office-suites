@@ -59,6 +59,7 @@ export type GroundedActionId =
   | 'Ask a Question'
   | 'Extract Notes'
   | 'Summarize'
+  | 'Compare Documents'
   | 'Extract';
 
 export interface GroundedSource {
@@ -102,4 +103,61 @@ export interface TransformResult {
   content: string;
   veritas: VeritasReceipt;
   sourcesUsed: string[];
+  artifact?: TransformArtifact;
+}
+
+export type TransformArtifactKind =
+  | 'text'
+  | 'slides'
+  | 'table'
+  | 'mindmap'
+  | 'infographic'
+  | 'audio'
+  | 'video'
+  | 'cards'
+  | 'quiz'
+  | 'timeline'
+  | 'faq'
+  | 'extract';
+
+export interface TransformSlide {
+  title: string;
+  subtitle: string;
+  bullets: string[];
+  notes?: string;
+}
+
+export interface TransformTableRow {
+  source: string;
+  type: string;
+  pages: number;
+  updated: string;
+  category: string;
+  summary: string;
+}
+
+export interface TransformMetric {
+  label: string;
+  value: string;
+  detail: string;
+}
+
+export interface TransformAudioTurn {
+  speaker: 'Alex' | 'Morgan';
+  text: string;
+  timestamp: string;
+}
+
+export interface TransformArtifact {
+  kind: TransformArtifactKind;
+  title: string;
+  description: string;
+  text?: string;
+  slides?: TransformSlide[];
+  rows?: TransformTableRow[];
+  metrics?: TransformMetric[];
+  nodes?: Array<{ id: string; label: string; parentId?: string }>;
+  dialogue?: TransformAudioTurn[];
+  cards?: Array<{ question: string; answer: string; source: string }>;
+  questions?: Array<{ question: string; options: string[]; answer: string }>;
 }

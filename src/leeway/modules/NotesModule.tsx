@@ -34,6 +34,7 @@ import {
   Check,
   FileText
 } from 'lucide-react';
+import { generateVeritasReceipt } from '../governance/leewayCompliance';
 
 interface NoteItem {
   id: string;
@@ -56,7 +57,7 @@ const INITIAL_NOTES: NoteItem[] = [
   {
     id: 'note-2',
     title: 'Calc Formula & Dependency Validation',
-    content: 'All portfolio budget sums in the telemetry spreadsheet (=SUM(D2:D6) and =AVERAGE(B2:B6)) have been verified against LibreOffice Calc core engine standards. Target Q2 budget allocation remains at $1.4M.',
+    content: 'All portfolio budget sums in the telemetry spreadsheet (=SUM(D2:D6) and =AVERAGE(B2:B6)) have been verified by the LeeWay Calc formula engine. Target Q2 budget allocation remains at $1.4M.',
     tag: 'Operations',
     updatedAt: 'Today, 09:45 AM',
     veritasHash: 'LW-NOTE-02B'
@@ -64,7 +65,7 @@ const INITIAL_NOTES: NoteItem[] = [
   {
     id: 'note-3',
     title: 'Veritas Attestation & FabricPASS Audit',
-    content: 'Zero-hallucination compliance score verified at 99.4%. Continuum pipeline ensures seamless context propagation between Open Notebook research grounding and LibreOffice document exports.',
+    content: 'Source-grounded outputs retain citations. The Continuum pipeline carries context between Open Notebook research and LeeWay Writer exports.',
     tag: 'Governance',
     updatedAt: 'Yesterday, 04:15 PM',
     veritasHash: 'LW-NOTE-03C'
@@ -84,13 +85,15 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ onSendToDoc }) => {
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || notes[0];
 
   const handleAddNote = () => {
+    const newNoteTitle = 'New Office Note';
+    const newNoteContent = 'Start writing your collaborative note or extract insights from active sources...';
     const newNote: NoteItem = {
       id: 'note-' + Date.now(),
-      title: 'New Office Note',
-      content: 'Start writing your collaborative note or extract insights from active sources...',
+      title: newNoteTitle,
+      content: newNoteContent,
       tag: 'General',
       updatedAt: 'Just now',
-      veritasHash: 'LW-NOTE-' + Math.random().toString(36).substring(2, 6).toUpperCase()
+      veritasHash: generateVeritasReceipt('NOTE', 1, `${newNoteTitle}|${newNoteContent}`).hash
     };
     setNotes([newNote, ...notes]);
     setSelectedNoteId(newNote.id);

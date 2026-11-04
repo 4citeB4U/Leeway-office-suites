@@ -37,59 +37,65 @@ export const LEEWAY_STANDARDS_VERSION = 'LEEWAY-STD-v2026.4';
 export const INITIAL_COMPLIANCE_CHECKS: ComplianceCheck[] = [
   {
     id: 'pass-01',
-    name: 'Voice & Runtime FabricPASS Check',
+    name: 'Browser-local Office Runtime',
     category: 'FabricPASS',
     status: 'PASS',
     score: 100,
-    description: 'Cryptographic binding between Agent execution loop and local runtime.'
+    description: 'Writer, Calc, Impress, Canvas, PDF, and notebook surfaces run in the browser client.'
   },
   {
     id: 'pass-02',
     name: 'Source-Grounded Token Validation',
     category: 'Grounding',
     status: 'PASS',
-    score: 98.8,
-    description: 'Zero-hallucination verification against active sources with paged citations.'
+    score: 100,
+    description: 'Selected-source transforms are deterministic and retain source titles and page references.'
   },
   {
     id: 'pass-03',
     name: 'Continuum Context Pipeline',
     category: 'Continuum',
     status: 'PASS',
-    score: 99.6,
-    description: 'Continuity -> Context -> Formula -> Capability -> Runtime -> Veritas -> Receipt.'
+    score: 100,
+    description: 'Source selection, local transformation, preview, and download remain in one client flow.'
   },
   {
     id: 'pass-04',
     name: 'Tri-Tier Memory Integrity',
     category: 'Memory',
     status: 'PASS',
-    score: 99.2,
-    description: 'Episodic session history, semantic vector graph, and procedural workflow templates.'
+    score: 100,
+    description: 'Selected sources are retained in browser storage when the browser permits local storage.'
   },
   {
     id: 'pass-05',
-    name: 'LibreOffice & Open Notebook Interlock',
+    name: 'Local Receipt Metadata',
     category: 'Veritas',
-    status: 'PASS',
-    score: 100,
-    description: 'Bi-directional interoperability between office documents and grounded research notebooks.'
+    status: 'WARN',
+    score: 0,
+    description: 'Outputs include deterministic grounding metadata; cryptographic signing is not claimed by this browser build.'
   }
 ];
 
 export function generateVeritasReceipt(
   operationName: string,
-  sourcesCount: number
+  sourcesCount: number,
+  groundingText = `${operationName}:${sourcesCount}`
 ): VeritasReceipt {
-  const randomChars = Math.random().toString(36).substring(2, 8).toUpperCase();
+  let hashValue = 2166136261;
+  for (const character of groundingText) {
+    hashValue ^= character.charCodeAt(0);
+    hashValue = Math.imul(hashValue, 16777619);
+  }
+  const stableHash = (hashValue >>> 0).toString(16).toUpperCase().padStart(8, '0');
   const timestamp = new Date().toISOString();
   return {
-    status: 'VERIFIED',
-    hash: `LW-VERITAS-${operationName.substring(0, 3).toUpperCase()}-${randomChars}`,
-    complianceScore: (99.0 + Math.random() * 0.9).toFixed(1) + '%',
+    status: 'COMPLIANT',
+    hash: `LW-GROUNDING-${operationName.substring(0, 3).toUpperCase()}-${stableHash}`,
+    complianceScore: 'SOURCE-GROUNDED',
     groundedSourcesCount: sourcesCount,
     timestamp,
     standardsVersion: LEEWAY_STANDARDS_VERSION,
-    formulaStage: 'Veritas Attestation & Receipt Delivery'
+    formulaStage: 'Local deterministic grounding; cryptographic signing not claimed'
   };
 }

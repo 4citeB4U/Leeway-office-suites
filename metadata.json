@@ -14,7 +14,7 @@
     "license": "Apache-2.0"
   },
   "name": "LeeWay Office Suites - Agent Tablet",
-  "description": "Governed office suite combining LibreOffice core capabilities and Open Notebook source-grounded research into the LeeWay Agent Tablet interface adhering to LeeWay Standards.",
+  "description": "Governed browser-local office suite combining LeeWay authoring surfaces and Open Notebook source-grounded research in the LeeWay Agent Tablet interface.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_LOCAL_GOVERNED_TRANSFORMS"]
 }

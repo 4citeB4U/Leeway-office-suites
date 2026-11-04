@@ -16,7 +16,7 @@ LICENSE: Apache-2.0
 
 LeeWay Office Suites is a governed React and Vite workspace that brings document, spreadsheet, presentation, drawing, PDF annotation, notes, source management, and research-notebook surfaces into one Agent Tablet interface.
 
-The project is designed to run with local, deterministic transformation and source-grounding engines. It does not require provider API keys or an external inference service.
+The project is designed to run with browser-local, deterministic transformation and source-grounding engines. It does not require provider API keys or an external inference service. Selected sources stay in the client, and every `Turn selected sources into` action opens its named artifact in the app.
 
 ## Requirements
 
@@ -52,9 +52,10 @@ The generic static-content workflow is intentionally absent. Publishing the repo
 - `src/App.tsx` — client shell and module routing.
 - `src/leeway/components` — governed workspace controls and modals.
 - `src/leeway/modules` — Office Suites user surfaces.
-- `src/server/libreofficeCore.ts` — local office-document generation helpers.
-- `src/server/openNotebookEngine.ts` — deterministic chunking, retrieval, citations, and synthesis.
-- `server.ts` — local Express/Vite runtime and API routes.
+- `src/leeway/groundedTransforms.ts` — browser-local source-to-artifact engine for audio, video, slides, maps, reports, tables, and study outputs.
+- `src/leeway/officeExports.ts` — browser-local ODT, DOCX, ODP, PDF, spreadsheet, and HTML deck exports.
+- `src/leeway/modules` — Writer, Calc, Impress, Canvas, PDF, notes, sources, and research surfaces.
+- `src/server` and `server.ts` — optional local development adapters; the deployed Pages client does not depend on these API routes.
 - `.github/workflows/deploy-pages.yml` — Pages build and deployment pipeline.
 
 ## LeeWay standards

@@ -16,10 +16,10 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
- * Documents Module (LibreOffice Writer Core Engine)
+ * Documents Module (LeeWay Writer browser workspace)
  * Realistic executive document authoring with rich text formatting ribbon,
  * page ruler, document canvas, templates, file import (.docx, .odt, .txt),
- * and real C++ backend export to .odt (OASIS OpenDocument Text), .docx, and .pdf.
+ * and browser-local export to .odt (OASIS OpenDocument Text), .docx, and .pdf.
  * Governed by LeeWay Standards Architecture (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
@@ -43,12 +43,11 @@ import {
   ShieldCheck,
   FileCode,
   FileCheck,
-  Cpu,
-  RefreshCw,
   Plus,
-  Sparkles,
-  BookOpen
+  Sparkles
 } from 'lucide-react';
+import { createDocxBlob, createOdtBlob, createPdfBlob } from '../officeExports';
+import { generateVeritasReceipt } from '../governance/leewayCompliance';
 
 interface DocumentsModuleProps {
   initialContent?: string;
@@ -98,15 +97,15 @@ Write your document here. Use the formatting ribbon above to format headers, lis
 ## Unified Office Suites & Sovereign Agent System
 
 ### 1. Architectural Overview
-This system integrates headless LibreOffice C++ core binaries with Open Notebook semantic RAG pipelines.
+This system integrates browser-local LeeWay Office capabilities with Open Notebook semantic grounding pipelines.
 
 ### 2. Security Requirements
 - All document transforms must emit a cryptographic Veritas SHA-256 receipt.
 - Local execution priority: no documents leave sovereign containment without explicit attestation.
 
 ### 3. API Contract
-- \`POST /api/libreoffice/writer/export\` -> Generates authentic ODF v1.2 packages.
-- \`POST /api/libreoffice/calc/eval\` -> Evaluates cascading formula expressions.`
+- Browser-local Writer export -> Generates an ODF-compatible document package.
+- Browser-local Calc formulas -> Evaluates supported spreadsheet expressions.`
   }
 };
 
@@ -183,38 +182,30 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
     e.target.value = '';
   };
 
-  // Real Export via LibreOffice C++ backend
+  const createNewDocument = () => {
+    setDocTitle(TEMPLATES.blank.title);
+    setContent(TEMPLATES.blank.content);
+    setNotice('New blank document created');
+    setTimeout(() => setNotice(null), 2500);
+  };
+
+  // Browser-local Office-compatible export; no server handoff required.
   const exportDocument = async (format: 'odt' | 'pdf' | 'docx') => {
     setIsExporting(format);
     try {
-      const res = await fetch('/api/libreoffice/writer/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: docTitle,
-          contentText: content,
-          format
-        })
-      });
-
-      const json = await res.json();
-      if (!json.success || !json.data) throw new Error(json.error || 'Export failed');
-
-      const byteCharacters = atob(json.data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: json.mimeType });
+      const blob = format === 'odt'
+        ? await createOdtBlob(docTitle, content)
+        : format === 'docx'
+          ? await createDocxBlob(docTitle, content)
+          : await createPdfBlob(docTitle, content);
+      const filename = `${docTitle.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.${format}`;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = json.filename;
+      a.download = filename;
       a.click();
-      URL.revokeObjectURL(url);
-
-      setNotice(`Exported ${json.filename} with Veritas Seal [${json.veritasReceipt?.hash || 'VERIFIED'}]`);
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice(`Saved ${filename} locally from LeeWay Writer`);
       setTimeout(() => setNotice(null), 3500);
     } catch (err: any) {
       alert('Document export failed: ' + err.message);
@@ -225,7 +216,7 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-950/80 overflow-hidden select-none border border-cyan-500/20 rounded-2xl shadow-2xl">
-      {/* 1. Header Ribbon: LibreOffice Writer Core & Document Actions */}
+      {/* 1. Header Ribbon: LeeWay Writer & Document Actions */}
       <div className="flex items-center justify-between px-3 py-2 bg-slate-900/95 border-b border-cyan-500/20 shrink-0 flex-wrap gap-2">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/50 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.3)]">
@@ -240,12 +231,12 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
                 className="text-xs sm:text-sm font-bold text-white tracking-wide bg-transparent border-b border-transparent hover:border-slate-700 focus:border-cyan-400 outline-none w-56 sm:w-72"
               />
               <span className="flex items-center gap-1 text-[9px] text-cyan-400 font-mono bg-cyan-950/90 px-1.5 py-0.5 rounded border border-cyan-800/60">
-                <Cpu className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
-                LibreOffice Writer v7.4.7.2
+                <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
+                LeeWay Writer
               </span>
             </div>
             <p className="text-[9px] text-slate-400 font-mono">
-              OASIS OpenDocument Text Engine • Real Multi-Page Canvas
+              Browser-local ODF-compatible workspace • Real editable document canvas
             </p>
           </div>
         </div>
@@ -261,6 +252,14 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
             className="hidden"
           />
           <button
+            onClick={createNewDocument}
+            className="flex items-center gap-1 rounded bg-cyan-950/90 px-2 py-1 text-xs font-semibold text-cyan-300 transition-colors hover:bg-cyan-900"
+            title="Create a new blank document"
+          >
+            <Plus className="h-3 w-3" />
+            <span>New Document</span>
+          </button>
+          <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-1 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 transition-colors cursor-pointer"
             title="Import existing document file"
@@ -269,12 +268,12 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
             <span>Import</span>
           </button>
 
-          {/* Export to .ODT (Native LibreOffice Writer) */}
+          {/* Export to .ODT */}
           <button
             onClick={() => exportDocument('odt')}
             disabled={isExporting !== null}
             className="flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-950/90 hover:bg-cyan-900 border border-cyan-500/60 text-xs font-semibold text-cyan-300 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-            title="Export authentic LibreOffice Writer (.odt) file"
+            title="Download an Office-compatible OpenDocument text file"
           >
             <FileCode className="w-3 h-3" />
             <span>{isExporting === 'odt' ? 'Exporting...' : 'Export .ODT'}</span>
@@ -296,7 +295,7 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
             onClick={() => exportDocument('pdf')}
             disabled={isExporting !== null}
             className="flex items-center gap-1 px-2.5 py-1 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-xs font-semibold text-rose-300 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-            title="Export publication PDF via LibreOffice headless print"
+            title="Download a PDF of the current document"
           >
             <FileCheck className="w-3 h-3" />
             <span>.PDF</span>
@@ -424,10 +423,7 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
         <button
           onClick={() =>
             insertBlock(
-              `> **Veritas Cryptographic Attestation Seal**\n> Hash: LW-VERITAS-${Math.random()
-                .toString(36)
-                .substring(2, 9)
-                .toUpperCase()} · Certified under LeeWay Standards Architecture v2026.4`
+              `> **Veritas Grounding Metadata**\n> Hash: ${generateVeritasReceipt('DOC', 1, `${docTitle}|${content}`).hash} · Deterministic local receipt`
             )
           }
           className="flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-800/60 hover:bg-cyan-900 text-[10px] text-cyan-300 font-semibold"
@@ -445,7 +441,7 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
         )}
       </div>
 
-      {/* 3. Top Margin Ruler (LibreOffice Style) */}
+      {/* 3. Top Margin Ruler */}
       <div className="h-4 bg-slate-900 border-b border-slate-800 flex items-center px-6 shrink-0 select-none overflow-hidden text-[8px] text-slate-500 font-mono">
         <div className="flex-1 max-w-3xl mx-auto flex items-center justify-between border-x border-slate-800 px-2">
           <span>0cm</span>
@@ -502,7 +498,7 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
         </div>
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-          <span>LibreOffice Core v7.4.7.2 · ODF v1.2</span>
+            <span>LeeWay Writer · ODF-compatible export</span>
         </div>
       </div>
     </div>

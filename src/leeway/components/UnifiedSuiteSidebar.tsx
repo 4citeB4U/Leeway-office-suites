@@ -94,7 +94,7 @@ const CONVERSION_OPTIONS: TransformOption[] = [
   { id: 'Slide Deck', label: 'Slide Deck', icon: Presentation, iconColor: 'text-rose-400' },
   { id: 'Video Overview', label: 'Video Overview', icon: Video, iconColor: 'text-emerald-400' },
   { id: 'Mind Map', label: 'Mind Map', icon: GitFork, iconColor: 'text-purple-300' },
-  { id: 'Reports', label: 'Reports', icon: FileText, iconColor: 'text-pink-400', badge: 'New!' },
+  { id: 'Reports', label: 'Reports', icon: FileText, iconColor: 'text-pink-400' },
   { id: 'Flashcards', label: 'Flashcards', icon: Layers, iconColor: 'text-yellow-400' },
   { id: 'Quiz', label: 'Quiz', icon: HelpCircle, iconColor: 'text-cyan-400' },
   { id: 'Infographic', label: 'Infographic', icon: BarChart2, iconColor: 'text-amber-300' },
@@ -295,10 +295,10 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-bold text-white tracking-wide">
-                  Turn sources into
+                  Turn selected sources into
                 </span>
                 <span className="text-[9px] text-slate-400 leading-none mt-0.5">
-                  Convert sources into structured outputs
+                  Create the artifact here • no handoff
                 </span>
               </div>
             </div>
@@ -324,6 +324,8 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
                   <button
                     key={opt.id}
                     onClick={() => onExecuteTransform(opt.id)}
+                    aria-label={`Create ${opt.label} from selected sources`}
+                    title={activeSourcesCount === 0 ? 'Select at least one source first' : `Create ${opt.label} from selected sources`}
                     disabled={isGenerating || activeSourcesCount === 0}
                     className="group relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-purple-500/50 transition-all cursor-pointer text-left disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >

@@ -21,8 +21,9 @@
  */
 
 import React, { useState } from 'react';
-import { X, Send, Sparkles, ShieldCheck, FileCheck, ArrowRightLeft } from 'lucide-react';
+import { X, Send, Sparkles, ShieldCheck, FileCheck } from 'lucide-react';
 import { GroundedActionId, GroundedSource } from '../types';
+import { answerFromSources, createGroundedTransform } from '../groundedTransforms';
 
 interface GroundedAskModalProps {
   initialAction: GroundedActionId | null;
@@ -47,48 +48,32 @@ export const GroundedAskModal: React.FC<GroundedAskModalProps> = ({
 
   const activeSources = sources.filter((s) => s.checked);
 
-  const handleSubmit = async (customPrompt?: string) => {
+  const handleSubmit = (customPrompt?: string) => {
     setIsLoading(true);
     const promptToSend = customPrompt || question;
-
-    try {
-      if (activeAction === 'Ask a Question') {
-        const res = await fetch('/api/ask', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: promptToSend, sources: activeSources })
-        });
-        const data = await res.json();
-        setResponseOutput(data.answer);
-        setCitations(data.citations || []);
-      } else {
-        const res = await fetch('/api/transform', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            transformType: activeAction === 'Extract Notes' ? 'Notes' : activeAction === 'Summarize' ? 'Summary' : 'Comparison',
-            prompt: promptToSend,
-            sources: activeSources
-          })
-        });
-        const data = await res.json();
-        setResponseOutput(data.result);
-        setCitations([
-          { source: 'LeeWay Project Report.pdf', page: 2, excerpt: 'Integration layer: 92% complete' },
-          { source: 'Workforce Brief.pdf', page: 1, excerpt: 'Phase 2 onboarding in progress' }
-        ]);
-      }
-    } catch {
-      setResponseOutput(
-        `[Veritas Verified] Grounded output for ${activeAction}:\n\n` +
-        `According to LeeWay Project Report.pdf (p. 2), the integration project is 92% complete with 42 indexed resources. Workforce onboarding is active in Phase 2.`
-      );
-      setCitations([
-        { source: 'LeeWay Project Report.pdf', page: 2, excerpt: 'Integration layer: 92% complete' }
-      ]);
-    } finally {
-      setIsLoading(false);
+    if (activeAction === 'Ask a Question') {
+      const answer = answerFromSources(promptToSend || 'Summarize the selected sources', activeSources);
+      setResponseOutput(answer.text);
+      setCitations(answer.citations.map((citation) => ({
+        source: citation.sourceTitle,
+        page: citation.pageNumber,
+        excerpt: citation.quote
+      })));
+    } else {
+      const transformType = activeAction === 'Extract Notes'
+        ? 'Extract'
+        : activeAction === 'Summarize'
+          ? 'Summary'
+          : 'Reports';
+      const result = createGroundedTransform(transformType, activeSources);
+      setResponseOutput(result.content);
+      setCitations(activeSources.slice(0, 3).map((source) => ({
+        source: source.title,
+        page: 1,
+        excerpt: source.summary || source.content.slice(0, 160)
+      })));
     }
+    setIsLoading(false);
   };
 
   return (
@@ -104,6 +89,7 @@ export const GroundedAskModal: React.FC<GroundedAskModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close grounded action"
             className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
@@ -215,7 +201,7 @@ export const GroundedAskModal: React.FC<GroundedAskModalProps> = ({
               }}
               className="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition-all cursor-pointer"
             >
-              Insert into LibreOffice Writer
+              Insert into LeeWay Writer
             </button>
           </div>
         )}

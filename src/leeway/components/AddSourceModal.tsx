@@ -36,7 +36,7 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Operations');
-  const [type, setType] = useState<'pdf' | 'docx' | 'md' | 'txt'>('pdf');
+  const [type, setType] = useState<'md' | 'txt'>('txt');
   const [pageCount, setPageCount] = useState(4);
   const [content, setContent] = useState('');
   const [sourceError, setSourceError] = useState<string | null>(null);
@@ -110,8 +110,6 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
                 onChange={(e) => setType(e.target.value as any)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400 cursor-pointer"
               >
-                <option value="pdf">PDF (.pdf)</option>
-                <option value="docx">Word (.docx)</option>
                 <option value="md">Markdown (.md)</option>
                 <option value="txt">Text (.txt)</option>
               </select>
@@ -173,7 +171,7 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
               required
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste raw source text or key excerpts for token grounding..."
+              placeholder="Paste actual source text or import a TXT/Markdown file. PDF/DOCX parsing is not yet available."
               className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400 resize-none"
             />
           </div>

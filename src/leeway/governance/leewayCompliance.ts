@@ -1,4 +1,19 @@
 /**
+ * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+ * REGION: LEEWAY.APP.GOVERNANCE
+ * TAG: LEEWAY.APP.GOVERNANCE.COMPLIANCE
+ * WHAT: Veritas-style compliance receipt helpers for local outputs.
+ * WHY: Keep this governed capability explicit, portable, and auditable.
+ * WHO: LeeWay Office Suites engineering.
+ * WHERE: src/leeway/governance/leewayCompliance.ts
+ * WHEN: 2026-11-04 standards audit.
+ * HOW: Use the file's typed implementation within the Office Suites runtime.
+ * AGENTS: ASSESS, ALIGN, AUDIT
+ * LICENSE: Apache-2.0
+ */
+
+
+/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * LeeWay Standards Governance & Compliance Layer

@@ -1,9 +1,20 @@
+# LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+# REGION: LEEWAY.APP.CONFIG
+# TAG: LEEWAY.APP.CONFIG.IGNORE.REPOSITORY
+# WHAT: Ignore generated, local, and secret-bearing workspace files.
+# WHY: Keep source control limited to governed project artifacts.
+# WHO: LeeWay Office Suites engineering.
+# WHERE: .gitignore
+# WHEN: 2026-11-04 standards audit.
+# HOW: Apply ordered Git ignore rules for local development and builds.
+# AGENTS: ASSESS, ALIGN, AUDIT
+# LICENSE: Apache-2.0
+
 node_modules/
 build/
 dist/
 coverage/
 .DS_Store
 *.log
-.aistudio/
 .env*
 !.env.example

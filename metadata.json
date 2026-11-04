@@ -1,6 +1,20 @@
 {
+  "leewayHeader": {
+    "region": "LEEWAY.APP.METADATA",
+    "tag": "LEEWAY.APP.METADATA.IDENTITY",
+    "fiveWH": {
+      "WHAT": "Application identity and capability metadata.",
+      "WHY": "Describe the governed Office Suites artifact to host tooling.",
+      "WHO": "LeeWay Office Suites engineering.",
+      "WHERE": "metadata.json",
+      "WHEN": "2026-11-04 standards audit.",
+      "HOW": "Expose structured metadata without executable provider bindings."
+    },
+    "agents": ["ASSESS", "ALIGN", "AUDIT"],
+    "license": "Apache-2.0"
+  },
   "name": "LeeWay Office Suites - Agent Tablet",
   "description": "Governed office suite combining LibreOffice core capabilities and Open Notebook source-grounded research into the LeeWay Agent Tablet interface adhering to LeeWay Standards.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": ["MAJOR_CAPABILITY_LOCAL_GOVERNED_TRANSFORMS"]
 }

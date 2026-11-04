@@ -1,4 +1,19 @@
 /**
+ * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+ * REGION: LEEWAY.APP.UI.MODULE
+ * TAG: LEEWAY.APP.UI.MODULE.PRESENTATIONS
+ * WHAT: Presentation authoring workspace with governed slide export.
+ * WHY: Keep this governed capability explicit, portable, and auditable.
+ * WHO: LeeWay Office Suites engineering.
+ * WHERE: src/leeway/modules/PresentationsModule.tsx
+ * WHEN: 2026-11-04 standards audit.
+ * HOW: Use the file's typed implementation within the Office Suites runtime.
+ * AGENTS: ASSESS, ALIGN, AUDIT
+ * LICENSE: Apache-2.0
+ */
+
+
+/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * Presentations Module (LibreOffice Impress Core Engine)

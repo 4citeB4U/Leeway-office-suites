@@ -1,4 +1,19 @@
 /**
+ * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+ * REGION: LEEWAY.APP.UI.COMPONENT
+ * TAG: LEEWAY.APP.UI.COMPONENT.SIDEBAR
+ * WHAT: Unified suite sidebar for module and transformation actions.
+ * WHY: Keep this governed capability explicit, portable, and auditable.
+ * WHO: LeeWay Office Suites engineering.
+ * WHERE: src/leeway/components/UnifiedSuiteSidebar.tsx
+ * WHEN: 2026-11-04 standards audit.
+ * HOW: Use the file's typed implementation within the Office Suites runtime.
+ * AGENTS: ASSESS, ALIGN, AUDIT
+ * LICENSE: Apache-2.0
+ */
+
+
+/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * Unified Suite Taskbar (Right-Hand Side)

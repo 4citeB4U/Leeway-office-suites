@@ -1,10 +1,25 @@
+/*
+ * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+ * REGION: LEEWAY.APP.UI
+ * TAG: LEEWAY.APP.UI.STYLE.GLOBAL
+ * WHAT: Global design tokens, typography fallbacks, and governed visual styling.
+ * WHY: Keep this governed capability explicit, portable, and auditable.
+ * WHO: LeeWay Office Suites engineering.
+ * WHERE: src/index.css
+ * WHEN: 2026-11-04 standards audit.
+ * HOW: Use the file's typed implementation within the Office Suites runtime.
+ * AGENTS: ASSESS, ALIGN, AUDIT
+ * LICENSE: Apache-2.0
+ */
+
+
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 body {

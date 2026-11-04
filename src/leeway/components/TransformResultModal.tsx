@@ -56,7 +56,7 @@ export const TransformResultModal: React.FC<TransformResultModalProps> = ({
               {result.transformType} Synthesis
             </h3>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 border border-cyan-800 text-cyan-300">
-              Grounded Output
+              {result.error ? 'Service unavailable' : 'Unattested output'}
             </span>
           </div>
 
@@ -68,16 +68,10 @@ export const TransformResultModal: React.FC<TransformResultModalProps> = ({
           </button>
         </div>
 
-        {/* Veritas Attestation Banner */}
-        <div className="px-6 py-2 bg-gradient-to-r from-cyan-950/80 via-blue-950/60 to-slate-950 border-b border-cyan-500/20 flex items-center justify-between text-[11px] font-mono text-cyan-300">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-cyan-400" />
-            <span>Veritas Attestation: {result.veritas.hash}</span>
-          </div>
-          <div className="flex items-center gap-3 text-slate-400">
-            <span>Score: <strong className="text-emerald-400">{result.veritas.complianceScore}</strong></span>
-            <span>Sources: <strong>{result.veritas.groundedSourcesCount}</strong></span>
-          </div>
+        {/* Evidence must be measured by the runtime, never invented in the UI. */}
+        <div className="px-6 py-2 bg-slate-950 border-b border-slate-800 text-[11px] font-mono text-amber-300">
+          {result.error ? 'BLOCKED — no production output was generated.' : 'UNVERIFIED — no Veritas receipt has been independently validated.'}
+          {result.veritas && <span className="ml-2">Backend-reported receipt: {result.veritas.hash} (not independently verified)</span>}
         </div>
 
         {/* Content Body */}
@@ -92,6 +86,7 @@ export const TransformResultModal: React.FC<TransformResultModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
+              disabled={result.error}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors cursor-pointer font-medium"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
@@ -99,6 +94,7 @@ export const TransformResultModal: React.FC<TransformResultModalProps> = ({
             </button>
 
             <button
+              disabled={result.error}
               onClick={() => {
                 const blob = new Blob([result.content], { type: 'text/markdown' });
                 const url = URL.createObjectURL(blob);
@@ -115,6 +111,7 @@ export const TransformResultModal: React.FC<TransformResultModalProps> = ({
           </div>
 
           <button
+            disabled={result.error}
             onClick={() => {
               onInsertIntoDoc(result.content);
               onClose();

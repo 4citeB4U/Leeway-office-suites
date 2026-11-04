@@ -58,7 +58,9 @@ export const GroundedAskModal: React.FC<GroundedAskModalProps> = ({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: promptToSend, sources: activeSources })
         });
+        if (!res.ok) throw new Error(`Ask API unavailable (HTTP ${res.status})`);
         const data = await res.json();
+        if (typeof data.answer !== 'string') throw new Error('Ask service returned no answer');
         setResponseOutput(data.answer);
         setCitations(data.citations || []);
       } else {
@@ -71,21 +73,16 @@ export const GroundedAskModal: React.FC<GroundedAskModalProps> = ({
             sources: activeSources
           })
         });
+        if (!res.ok) throw new Error(`Transform API unavailable (HTTP ${res.status})`);
         const data = await res.json();
+        if (typeof data.result !== 'string') throw new Error('Transform service returned no result');
         setResponseOutput(data.result);
-        setCitations([
-          { source: 'LeeWay Project Report.pdf', page: 2, excerpt: 'Integration layer: 92% complete' },
-          { source: 'Workforce Brief.pdf', page: 1, excerpt: 'Phase 2 onboarding in progress' }
-        ]);
+        setCitations([]);
       }
-    } catch {
-      setResponseOutput(
-        `[Veritas Verified] Grounded output for ${activeAction}:\n\n` +
-        `According to LeeWay Project Report.pdf (p. 2), the integration project is 92% complete with 42 indexed resources. Workforce onboarding is active in Phase 2.`
-      );
-      setCitations([
-        { source: 'LeeWay Project Report.pdf', page: 2, excerpt: 'Integration layer: 92% complete' }
-      ]);
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : String(err);
+      setResponseOutput(`BLOCKED: ${reason}. No grounded answer was produced.`);
+      setCitations([]);
     } finally {
       setIsLoading(false);
     }
@@ -206,7 +203,7 @@ export const GroundedAskModal: React.FC<GroundedAskModalProps> = ({
         </div>
 
         {/* Footer */}
-        {responseOutput && (
+        {responseOutput && !responseOutput.startsWith('BLOCKED:') && (
           <div className="px-6 py-3 bg-slate-950 border-t border-slate-800 flex justify-end gap-2 text-xs">
             <button
               onClick={() => {

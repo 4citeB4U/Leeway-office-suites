@@ -2,64 +2,195 @@
  * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
  * REGION: LEEWAY.APP.UI
  * TAG: LEEWAY.APP.UI.STYLE.GLOBAL
- * WHAT: Global design tokens, typography fallbacks, and governed visual styling.
- * WHY: Keep this governed capability explicit, portable, and auditable.
+ * WHAT: Global design tokens and AGPU production workspace styling.
+ * WHY: Give LeeWay Office Suites a calm, professional desktop environment.
  * WHO: LeeWay Office Suites engineering.
  * WHERE: src/index.css
- * WHEN: 2026-11-04 standards audit.
- * HOW: Use the file's typed implementation within the Office Suites runtime.
+ * WHEN: 2026-11-04 visual system repair.
+ * HOW: Apply accessible desktop tokens and retone existing module surfaces.
  * AGENTS: ASSESS, ALIGN, AUDIT
  * LICENSE: Apache-2.0
  */
-
 
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 body {
   font-family: var(--font-sans);
+  background: #eef2f7;
+  color: #172033;
 }
 
-/* Custom scrollbars for high-tech tablet look */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* AGPU desktop system: a calm production workspace instead of a developer dashboard. */
+.agpu-desktop {
+  --agpu-canvas: #eef2f7;
+  --agpu-panel: #ffffff;
+  --agpu-panel-soft: #f7f9fc;
+  --agpu-border: #d8e1ec;
+  --agpu-border-strong: #c4d0df;
+  --agpu-ink: #172033;
+  --agpu-muted: #64748b;
+  --agpu-blue: #2459a6;
+  background:
+    radial-gradient(circle at 15% -10%, rgba(255, 255, 255, 0.95), transparent 35%),
+    linear-gradient(135deg, #f7f9fc 0%, var(--agpu-canvas) 55%, #e8eef6 100%);
+  color: var(--agpu-ink);
 }
-::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+
+.agpu-window-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--agpu-border);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
 }
+
+.agpu-window-dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.agpu-window-dot-close { background: #ef6a62; }
+.agpu-window-dot-minimize { background: #f2bd4e; }
+.agpu-window-dot-maximize { background: #5fc45b; }
+
+.agpu-workspace { background: transparent; }
+
+.agpu-app-header {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--agpu-border);
+}
+
+.agpu-toolstrip {
+  background: #f4f7fb;
+  border-color: var(--agpu-border);
+}
+
+.agpu-system-dock {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--agpu-border);
+  box-shadow: 0 -4px 16px rgba(44, 62, 88, 0.06);
+}
+
+.agpu-sidebar,
+.agpu-sidebar-collapsed {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: var(--agpu-border) !important;
+  box-shadow: 0 10px 28px rgba(46, 65, 90, 0.08) !important;
+  backdrop-filter: blur(12px);
+}
+
+.agpu-sidebar-header {
+  background: #ffffff !important;
+  border-color: var(--agpu-border) !important;
+}
+
+/* Keep the accent language useful and restrained on a production surface. */
+.agpu-desktop .text-cyan-400,
+.agpu-desktop .text-cyan-300,
+.agpu-desktop .text-cyan-200 { color: #2f6ea6 !important; }
+.agpu-desktop .text-purple-400,
+.agpu-desktop .text-purple-300 { color: #6f62a6 !important; }
+.agpu-desktop .text-rose-400 { color: #b35e73 !important; }
+.agpu-desktop .text-emerald-400 { color: #37836c !important; }
+.agpu-desktop .text-yellow-400,
+.agpu-desktop .text-amber-400,
+.agpu-desktop .text-amber-300 { color: #a87824 !important; }
+.agpu-desktop .text-pink-400 { color: #a45e86 !important; }
+.agpu-desktop [class*="bg-cyan-500/"],
+.agpu-desktop [class*="bg-cyan-400/"] { background-color: #e7f1fb !important; }
+.agpu-desktop [class*="bg-purple-500/"],
+.agpu-desktop [class*="bg-purple-400/"] { background-color: #f0eef9 !important; }
+.agpu-desktop [class*="bg-rose-500/"],
+.agpu-desktop [class*="bg-rose-400/"] { background-color: #fbf0f3 !important; }
+.agpu-desktop [class*="bg-emerald-500/"],
+.agpu-desktop [class*="bg-emerald-400/"] { background-color: #eaf6f1 !important; }
+.agpu-desktop [class*="border-cyan-500/"],
+.agpu-desktop [class*="border-cyan-400/"] { border-color: #b9d4ec !important; }
+.agpu-desktop [class*="border-purple-500/"],
+.agpu-desktop [class*="border-purple-400/"] { border-color: #d6d0ed !important; }
+
+/* Retone the existing module surfaces without changing their working behavior. */
+.agpu-desktop .bg-slate-950,
+.agpu-desktop [class*="bg-slate-950/"] { background-color: #ffffff !important; }
+.agpu-desktop .bg-slate-900,
+.agpu-desktop [class*="bg-slate-900/"] { background-color: #f7f9fc !important; }
+.agpu-desktop .bg-slate-800,
+.agpu-desktop [class*="bg-slate-800/"] { background-color: #edf2f7 !important; }
+.agpu-desktop .bg-slate-700,
+.agpu-desktop [class*="bg-slate-700/"] { background-color: #e3eaf2 !important; }
+
+.agpu-desktop [class*="bg-[#090d16]"],
+.agpu-desktop [class*="bg-[#0a0f1d]"],
+.agpu-desktop [class*="bg-[#071324]"] { background-color: #f4f7fb !important; }
+
+.agpu-desktop [class*="from-slate-950"],
+.agpu-desktop [class*="via-slate-950"],
+.agpu-desktop [class*="to-slate-950"],
+.agpu-desktop [class*="from-purple-950"],
+.agpu-desktop [class*="from-rose-950"],
+.agpu-desktop [class*="from-emerald-950"],
+.agpu-desktop [class*="from-[#071324]"] {
+  background-image: linear-gradient(145deg, #ffffff 0%, #f2f6fb 100%) !important;
+}
+
+.agpu-desktop [class*="bg-cyan-950/"] { background-color: #e8f4ff !important; }
+.agpu-desktop [class*="bg-blue-950/"] { background-color: #eaf0ff !important; }
+.agpu-desktop [class*="bg-purple-950/"] { background-color: #f2edff !important; }
+.agpu-desktop [class*="bg-emerald-950/"] { background-color: #eaf8f0 !important; }
+.agpu-desktop [class*="bg-rose-950/"] { background-color: #fff0f1 !important; }
+.agpu-desktop [class*="bg-amber-950/"] { background-color: #fff6e5 !important; }
+.agpu-desktop [class*="bg-yellow-950/"] { background-color: #fff7dc !important; }
+
+.agpu-desktop .text-white { color: #172033 !important; }
+.agpu-desktop .text-slate-100 { color: #243247 !important; }
+.agpu-desktop .text-slate-200 { color: #344258 !important; }
+.agpu-desktop .text-slate-300 { color: #526078 !important; }
+.agpu-desktop .text-slate-400 { color: #66758a !important; }
+.agpu-desktop .text-slate-500 { color: #7a8798 !important; }
+.agpu-desktop .text-slate-600 { color: #8b98a8 !important; }
+
+.agpu-desktop .border-slate-800,
+.agpu-desktop [class*="border-slate-800/"] { border-color: #d8e1ec !important; }
+.agpu-desktop .border-slate-700,
+.agpu-desktop [class*="border-slate-700/"] { border-color: #cbd6e3 !important; }
+
+.agpu-desktop input,
+.agpu-desktop textarea,
+.agpu-desktop select { color: #172033; }
+.agpu-desktop input::placeholder,
+.agpu-desktop textarea::placeholder { color: #8794a5 !important; }
+.agpu-desktop video { background: #172033; }
+
+/* Quiet desktop scrollbars. */
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: #e9eef5; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.25);
-  border-radius: 9999px;
+  background: #bdc9d8;
+  border: 2px solid #e9eef5;
+  border-radius: 8px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.45);
-}
+::-webkit-scrollbar-thumb:hover { background: #8ea2ba; }
 
-/* Dedicated Taskbar Scrollbar with high contrast and smooth tracking */
 .custom-suite-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(34, 211, 238, 0.5) rgba(15, 23, 42, 0.8);
+  scrollbar-color: #aebed1 #eef2f7;
   scrollbar-gutter: stable;
 }
-.custom-suite-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  display: block;
-}
-.custom-suite-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.8);
-  border-radius: 9999px;
-}
-.custom-suite-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.45);
-  border-radius: 9999px;
-}
-.custom-suite-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.85);
-}
+.custom-suite-scrollbar::-webkit-scrollbar { width: 8px; display: block; }
+.custom-suite-scrollbar::-webkit-scrollbar-track { background: #eef2f7; border-radius: 8px; }
+.custom-suite-scrollbar::-webkit-scrollbar-thumb { background: #aebed1; border-radius: 8px; }
+.custom-suite-scrollbar::-webkit-scrollbar-thumb:hover { background: #7e96b1; }

@@ -16,7 +16,7 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
- * LeeWay Office Suites — Agent Tablet
+ * LeeWay Office Suites — AGPU Workstation
  * Unifying browser-local Office authoring & Open Notebook Grounded Synthesis
  * Governed by LeeWay Standards Architecture (https://github.com/4citeB4U/LeeWay-Standards)
  */
@@ -136,7 +136,7 @@ export default function App() {
   return (
     <TabletFrame>
       {/* Main App Container */}
-      <div className="flex-1 flex flex-col p-2 gap-2 overflow-hidden min-h-0">
+      <div className="agpu-workspace flex-1 flex flex-col p-4 gap-3 overflow-hidden min-h-0">
         {/* Banner: LeeWay Office Suites with Top-Right Tool Section */}
         <OfficeSuitesBanner
           activeModuleTitle={activeModule}
@@ -155,7 +155,7 @@ export default function App() {
         />
 
         {/* Studio Workspace: Full Expansive Preview on Left, Unified Taskbar on Right */}
-        <div className="flex-1 flex gap-2 overflow-hidden min-h-0">
+        <div className="agpu-workspace-grid flex-1 flex gap-3 overflow-hidden min-h-0">
           {/* Dominant Left Canvas: Active Module Preview (Documents, Spreadsheets, Presentations, Draw, PDF, Research, Notes, Sources) */}
           <main className="flex-1 flex flex-col overflow-hidden min-w-0">
             {activeModule === 'pdf' && (
@@ -215,7 +215,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* 3. Bottom System Dock (Tablet OS) — Redundant second bottom bar removed as requested */}
+      {/* 3. Bottom system dock — shared workstation navigation */}
       <SystemDock
         activeDockTab={activeDockTab}
         onSelectDockTab={(tab) => {

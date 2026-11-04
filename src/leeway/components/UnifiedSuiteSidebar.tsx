@@ -120,7 +120,7 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
 
   if (isCollapsed) {
     return (
-      <aside className="w-12 shrink-0 flex flex-col items-center gap-2 py-2 select-none bg-slate-950/90 border-l border-slate-800/80 rounded-xl">
+      <aside className="agpu-sidebar-collapsed w-12 shrink-0 flex flex-col items-center gap-2 py-2 select-none bg-slate-950/90 border-l border-slate-800/80 rounded-xl">
         {/* Expand Toggle Button */}
         <button
           onClick={onToggleCollapse}
@@ -164,19 +164,19 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
   }
 
   return (
-    <aside className="w-72 sm:w-80 shrink-0 flex flex-col h-full max-h-full min-h-0 select-none bg-slate-950/95 border-l border-cyan-500/20 rounded-xl overflow-hidden backdrop-blur-md shadow-2xl">
+    <aside className="agpu-sidebar w-72 sm:w-80 shrink-0 flex flex-col h-full max-h-full min-h-0 select-none bg-slate-950/95 border-l border-cyan-500/20 rounded-xl overflow-hidden backdrop-blur-md shadow-2xl">
       {/* Top Bar with Collapse Button */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b border-slate-800/90 bg-slate-950">
+      <div className="agpu-sidebar-header shrink-0 flex items-center justify-between px-3 py-2 border-b border-slate-800/90 bg-slate-950">
         <div className="flex items-center gap-2 min-w-0">
           <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-cyan-950 border border-cyan-400/60 shadow-[0_0_12px_rgba(34,211,238,0.5)] shrink-0">
             <Layers className="w-3.5 h-3.5 text-cyan-300 drop-shadow-[0_0_4px_rgba(34,211,238,0.8)]" />
           </div>
           <div className="flex flex-col min-w-0">
             <h2 className="text-xs sm:text-sm font-bold tracking-wide text-white truncate">
-              LeeWay Suite Taskbar
+            LeeWay Workspace
             </h2>
             <p className="text-[10px] text-slate-400 truncate leading-none mt-0.5">
-              Office Tools & Conversions Unified
+              Office apps & source actions
             </p>
           </div>
         </div>

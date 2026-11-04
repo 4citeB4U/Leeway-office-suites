@@ -84,8 +84,7 @@ const OFFICE_TOOLS: OfficeToolItem[] = [
   { id: 'draw', label: 'Draw', sublabel: 'Vector & Canvas', icon: Pencil, iconColor: 'text-yellow-400' },
   { id: 'pdf', label: 'PDF & Annotation', sublabel: 'Reviewer & Markup', icon: FileSignature, iconColor: 'text-pink-400' },
   { id: 'research', label: 'Research Notebook', sublabel: 'Open Notebook • Audio', icon: BookOpen, iconColor: 'text-purple-400' },
-  { id: 'notes', label: 'Notes', sublabel: 'Action Items & Memos', icon: CalendarCheck, iconColor: 'text-amber-400' },
-  { id: 'sources', label: 'Sources', sublabel: 'Active Document Index', icon: Layers, iconColor: 'text-cyan-400' }
+  { id: 'notes', label: 'Notes', sublabel: 'Action Items & Memos', icon: CalendarCheck, iconColor: 'text-amber-400' }
 ];
 
 interface TransformOption {

@@ -215,8 +215,7 @@ export default function App() {
             onToggleSource={handleToggleSource}
             onAddSource={() => setIsAddSourceOpen(true)}
             onOpenContentVault={() => {
-              setActiveModule('sources');
-              window.alert('The canonical Continuum Content Vault is not connected to this deployment. Showing existing local sources only; no Vault files have been fetched or copied.');
+              window.open('https://4citeb4u.github.io/Leeway-Content-Vault/', '_blank', 'noopener,noreferrer');
             }}
           />
         </div>

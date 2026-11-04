@@ -23,7 +23,7 @@
  * Governed by LeeWay Standards Architecture (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   FileText,
   Download,
@@ -110,13 +110,17 @@ This system integrates browser-local LeeWay Office capabilities with Open Notebo
 };
 
 export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent }) => {
-  const [docTitle, setDocTitle] = useState(TEMPLATES.projectReport.title);
-  const [content, setContent] = useState(initialContent || TEMPLATES.projectReport.content);
+  const [docTitle, setDocTitle] = useState(TEMPLATES.blank.title);
+  const [content, setContent] = useState(initialContent || TEMPLATES.blank.content);
   const [fontFamily, setFontFamily] = useState<'sans' | 'serif' | 'mono'>('sans');
   const [fontSize, setFontSize] = useState<string>('11pt');
   const [isExporting, setIsExporting] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (initialContent?.trim()) setContent(initialContent);
+  }, [initialContent]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -167,6 +171,11 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!/\.(txt|md)$/i.test(file.name)) {
+      setNotice('PDF/DOCX/ODT import is not yet implemented. Use TXT or Markdown; binary files will not be interpreted as text.');
+      e.target.value = '';
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (evt) => {
@@ -248,7 +257,7 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
             type="file"
             ref={fileInputRef}
             onChange={handleFileUpload}
-            accept=".docx,.odt,.txt,.md"
+            accept=".txt,.md"
             className="hidden"
           />
           <button
@@ -324,9 +333,9 @@ export const DocumentsModule: React.FC<DocumentsModuleProps> = ({ initialContent
           }}
           className="bg-slate-950 text-slate-200 text-xs px-2 py-0.5 rounded border border-slate-800 focus:border-cyan-400 outline-none cursor-pointer"
         >
-          <option value="projectReport">Template: Project Report</option>
-          <option value="technicalSpec">Template: Tech Specification</option>
           <option value="blank">Template: Blank Document</option>
+          <option value="technicalSpec">Template: Tech Specification</option>
+          <option value="projectReport">Template: Project Report (example only)</option>
         </select>
 
         {/* Font Family */}

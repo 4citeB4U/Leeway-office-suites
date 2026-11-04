@@ -46,9 +46,12 @@ import {
   Calendar,
   List,
   FileEdit,
-  Check
+  Check,
+  FolderOpen,
+  Plus,
+  AlertCircle
 } from 'lucide-react';
-import { SuiteModuleId, TransformActionId } from '../types';
+import { GroundedSource, SuiteModuleId, TransformActionId } from '../types';
 
 interface UnifiedSuiteSidebarProps {
   activeModule: SuiteModuleId;
@@ -59,6 +62,10 @@ interface UnifiedSuiteSidebarProps {
   onToggleCollapse: () => void;
   sourcesCount: number;
   activeSourcesCount: number;
+  sources: GroundedSource[];
+  onToggleSource: (id: string) => void;
+  onAddSource: () => void;
+  onOpenContentVault: () => void;
 }
 
 interface OfficeToolItem {
@@ -113,10 +120,15 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
   sourcesCount,
-  activeSourcesCount
+  activeSourcesCount,
+  sources,
+  onToggleSource,
+  onAddSource,
+  onOpenContentVault
 }) => {
   const [isOfficeToolsOpen, setIsOfficeToolsOpen] = useState(true);
   const [isTurnSourcesOpen, setIsTurnSourcesOpen] = useState(true);
+  const [isSourcesOpen, setIsSourcesOpen] = useState(true);
 
   if (isCollapsed) {
     return (
@@ -143,6 +155,14 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
         >
           <Wrench className="w-4 h-4" />
         </button>
+
+        {/* Sources quick selector */}
+        <button
+          onClick={() => { onToggleCollapse(); setIsSourcesOpen(true); }}
+          className="p-1.5 rounded-lg text-emerald-400 hover:text-white hover:bg-slate-800"
+          title="Sources"
+          aria-label="Expand sources selector"
+        ><Layers className="w-4 h-4" /></button>
 
         {/* Turn Sources Into Shortcut */}
         <button
@@ -281,7 +301,35 @@ export const UnifiedSuiteSidebar: React.FC<UnifiedSuiteSidebarProps> = ({
         </div>
 
         {/* ==================================================== */}
-        {/* SECTION 2: Turn sources into (Dropdown / Accordion) */}
+        {/* SECTION 2: Sources — shared selected-source state */}
+        {/* ==================================================== */}
+        <section className="shrink-0 rounded-xl border border-emerald-500/30 bg-slate-900/50 overflow-hidden shadow-sm" aria-label="Sources selection">
+          <button type="button" onClick={() => setIsSourcesOpen(!isSourcesOpen)}
+            aria-expanded={isSourcesOpen}
+            className="w-full flex items-center justify-between px-3 py-2 bg-slate-900/90 hover:bg-slate-800/80 text-left">
+            <span className="flex items-center gap-2"><Layers className="w-4 h-4 text-emerald-300" /><span className="text-xs font-bold text-white">Sources</span></span>
+            <span className="flex items-center gap-2 text-[10px] text-emerald-300">{activeSourcesCount} selected / {sourcesCount}{isSourcesOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}</span>
+          </button>
+          {isSourcesOpen && <div className="border-t border-slate-800 p-2 space-y-2">
+            <div className="max-h-44 overflow-y-auto space-y-1" role="group" aria-label="Choose sources for transformations">
+              {sources.length === 0 && <p className="text-xs text-slate-400 px-1">No sources yet. Add a source to begin.</p>}
+              {sources.map(source => <label key={source.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-200 hover:bg-slate-800/80 cursor-pointer">
+                <input type="checkbox" checked={source.checked} onChange={() => onToggleSource(source.id)} className="accent-emerald-400 shrink-0" />
+                <span className="truncate flex-1" title={source.title}>{source.title}</span>
+                <span className="text-[9px] text-slate-500 uppercase">{source.type}</span>
+              </label>)}
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button type="button" onClick={onAddSource} className="flex items-center justify-center gap-1 rounded-lg bg-emerald-950/70 border border-emerald-700/40 px-2 py-1.5 text-[10px] font-semibold text-emerald-200"><Plus className="w-3 h-3" />Add source</button>
+              <button type="button" onClick={onOpenContentVault} className="flex items-center justify-center gap-1 rounded-lg bg-slate-800 border border-slate-700 px-2 py-1.5 text-[10px] font-semibold text-slate-200"><FolderOpen className="w-3 h-3" />Content Vault</button>
+            </div>
+            <p className="flex items-start gap-1 text-[9px] text-amber-300"><AlertCircle className="w-3 h-3 shrink-0" />Continuum Content Vault connection not verified; local sources shown.</p>
+            <button type="button" onClick={() => onSelectModule('sources')} className="text-[10px] text-cyan-300 hover:underline">Manage and inspect all sources</button>
+          </div>}
+        </section>
+
+        {/* ==================================================== */}
+        {/* SECTION 3: Turn sources into (Dropdown / Accordion) */}
         {/* ==================================================== */}
         <div className="shrink-0 rounded-xl border border-slate-800/90 bg-slate-900/50 overflow-hidden shadow-sm">
           {/* Turn Sources Into Dropdown Header */}

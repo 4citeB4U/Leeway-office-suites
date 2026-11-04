@@ -211,6 +211,13 @@ export default function App() {
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             sourcesCount={sources.length}
             activeSourcesCount={sources.filter((s) => s.checked).length}
+            sources={sources}
+            onToggleSource={handleToggleSource}
+            onAddSource={() => setIsAddSourceOpen(true)}
+            onOpenContentVault={() => {
+              setActiveModule('sources');
+              window.alert('The canonical Continuum Content Vault is not connected to this deployment. Showing existing local sources only; no Vault files have been fetched or copied.');
+            }}
           />
         </div>
       </div>

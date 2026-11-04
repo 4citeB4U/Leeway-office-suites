@@ -1,3 +1,15 @@
+# LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+# REGION: LEEWAY.APP.DEPLOYMENT
+# TAG: LEEWAY.APP.DEPLOYMENT.GITHUBPAGES.VITE
+# WHAT: Build and publish the Vite client to GitHub Pages.
+# WHY: Ensure the deployed project site contains compiled assets beneath its repository path.
+# WHO: LeeWay Office Suites engineering.
+# WHERE: .github/workflows/deploy-pages.yml
+# WHEN: 2026-11-04 standards audit.
+# HOW: Install, compile, package, and deploy the dist artifact through the Pages environment.
+# AGENTS: ASSESS, ALIGN, AUDIT
+# LICENSE: Apache-2.0
+
 name: Deploy GitHub Pages
 
 on:

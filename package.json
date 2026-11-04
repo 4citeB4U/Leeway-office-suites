@@ -1,8 +1,22 @@
 {
-  "name": "react-example",
+  "name": "leeway-office-suites",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "x-leeway-header": {
+    "region": "LEEWAY.APP.PACKAGE",
+    "tag": "LEEWAY.APP.PACKAGE.MANIFEST.RUNTIME",
+    "fiveWH": {
+      "WHAT": "Application package manifest.",
+      "WHY": "Declare the governed runtime and build dependencies.",
+      "WHO": "LeeWay Office Suites engineering.",
+      "WHERE": "package.json",
+      "WHEN": "2026-11-04 standards audit.",
+      "HOW": "Use package-manager-compatible JSON metadata and scripts."
+    },
+    "agents": ["ASSESS", "ALIGN", "AUDIT"],
+    "license": "Apache-2.0"
+  },
   "scripts": {
     "dev": "tsx server.ts",
     "start": "tsx server.ts",
@@ -12,10 +26,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",
-    "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "jszip": "^3.10.2",
     "lucide-react": "^0.546.0",
@@ -32,7 +44,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.2",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",

@@ -1,9 +1,21 @@
+/**
+ * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+ * REGION: LEEWAY.APP.SERVER
+ * TAG: LEEWAY.APP.SERVER.RUNTIME
+ * WHAT: Local HTTP and Vite application server.
+ * WHY: Expose governed Office Suites APIs and the static client runtime.
+ * WHO: LeeWay Office Suites engineering.
+ * WHERE: server.ts
+ * WHEN: 2026-11-04 standards audit.
+ * HOW: Express routes, deterministic engines, and Vite middleware.
+ * AGENTS: ASSESS, ALIGN, AUDIT
+ * LICENSE: Apache-2.0
+ */
+
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
 import {
   getLibreOfficeInfo,
   convertWithLibreOffice,
@@ -13,8 +25,6 @@ import {
   createSpreadsheetFile
 } from './src/server/libreofficeCore.ts';
 import { OpenNotebookEngine } from './src/server/openNotebookEngine.ts';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,19 +37,8 @@ const PORT = !isNaN(cliPort) ? cliPort : 3000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Initialize Google Gen AI client if key exists
-const apiKey = process.env.GEMINI_API_KEY;
-let aiClient: GoogleGenAI | null = null;
-if (apiKey && apiKey !== 'MY_GEMINI_API_KEY') {
-  try {
-    aiClient = new GoogleGenAI({ apiKey });
-  } catch (err) {
-    console.warn('Failed to initialize GoogleGenAI client:', err);
-  }
-}
-
-// Initialize Open Notebook Engine
-const openNotebook = new OpenNotebookEngine(aiClient);
+// Initialize the local, deterministic Open Notebook engine.
+const openNotebook = new OpenNotebookEngine();
 
 // Pre-seed default grounded sources into Open Notebook
 openNotebook.ingestDocument(
@@ -417,54 +416,7 @@ app.post('/api/ask', async (req, res) => {
 app.post('/api/transform', async (req, res) => {
   const { transformType, prompt, sources, targetOutput } = req.body;
 
-  const sourceContext = (sources || [])
-    .map(
-      (s: { title: string; type: string; pageCount?: number; content?: string }, idx: number) =>
-        `[Source ${idx + 1}: ${s.title} (${s.type}, ${s.pageCount || 1} pages)]\n${s.content || 'Project updates, workforce onboarding milestones (92% complete), knowledge base expansions (42 resources), team productivity improvements.'}`
-    )
-    .join('\n\n');
-
-  if (aiClient) {
-    try {
-      const systemInstruction = `You are the LeeWay Autonomous Office Transformation & Grounding Engine adhering to LeeWay Standards (Veritas Receipt Verification, Source Grounding, and Deterministic Syntheses).
-Generate a structured, professional, executive-grade response for the requested transformation: "${transformType}".
-Include explicit grounded source citations in brackets like [Source 1: LeeWay Project Report.pdf, p. 1-2].
-Ensure tone is precise, executive, and highly actionable.`;
-
-      const userPrompt = `Transformation Type: ${transformType}
-Custom Prompt / Focus: ${prompt || 'Standard comprehensive output'}
-Target Output: ${targetOutput || 'standard'}
-
-Active Grounded Sources:
-${sourceContext}
-
-Produce the output now with clear section headers, bulleted synthesis, and verifiable evidence markers.`;
-
-      const response = await aiClient.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: [
-          { role: 'user', parts: [{ text: `${systemInstruction}\n\n${userPrompt}` }] }
-        ]
-      });
-
-      const text = response.text || '';
-      return res.json({
-        success: true,
-        result: text,
-        veritas: {
-          status: 'VERIFIED',
-          hash: 'LW-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-          groundedSourcesCount: sources?.length || 3,
-          complianceScore: '99.4%',
-          timestamp: new Date().toISOString()
-        }
-      });
-    } catch (err: unknown) {
-      console.error('Gemini API transformation failed, falling back to governed rule engine:', err);
-    }
-  }
-
-  // Governed deterministic fallback matching image_9093f33a.png and unified modules
+  // Governed deterministic transformation engine.
   const fallbackOutputs: Record<string, string> = {
     'Audio Overview': `# AUDIO OVERVIEW SCRIPT: LeeWay Project Synthesis
 [Source 1: LeeWay Project Report.pdf | Source 2: Integration Plan.docx]

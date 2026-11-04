@@ -1,4 +1,19 @@
 /**
+ * LEEWAY COMPLIANCE HEADER — DO NOT REMOVE
+ * REGION: LEEWAY.APP.SERVER
+ * TAG: LEEWAY.APP.SERVER.LIBREOFFICE
+ * WHAT: Local office-document conversion and generation core.
+ * WHY: Keep this governed capability explicit, portable, and auditable.
+ * WHO: LeeWay Office Suites engineering.
+ * WHERE: src/server/libreofficeCore.ts
+ * WHEN: 2026-11-04 standards audit.
+ * HOW: Use the file's typed implementation within the Office Suites runtime.
+ * AGENTS: ASSESS, ALIGN, AUDIT
+ * LICENSE: Apache-2.0
+ */
+
+
+/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * LibreOffice Core Engine Integration

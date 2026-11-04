@@ -55,7 +55,6 @@ import {
   TransformResult
 } from './leeway/types';
 import { INITIAL_SOURCES } from './leeway/data/defaultSources';
-import { generateVeritasReceipt } from './leeway/governance/leewayCompliance';
 
 export default function App() {
   const [activeModule, setActiveModule] = useState<SuiteModuleId>('pdf');
@@ -111,45 +110,27 @@ export default function App() {
         })
       });
 
-      if (!response.ok) throw new Error('Transform request failed');
+      if (!response.ok) throw new Error(`Transform API unavailable (HTTP ${response.status})`);
       const data = await response.json();
+      if (typeof data.result !== 'string' || !data.result.trim()) {
+        throw new Error('Transform service returned no usable output');
+      }
 
       setTransformResult({
         transformType,
         content: data.result,
-        veritas: data.veritas || generateVeritasReceipt(transformType, activeSources.length),
+        // Only a separately verified backend may supply an attestation.
+        // Never synthesize a receipt or score in the client.
         sourcesUsed: activeSources.map((s) => s.title)
       });
     } catch (err) {
-      console.warn('API transform error, generating verified local output:', err);
-      const veritas = generateVeritasReceipt(transformType, activeSources.length);
-      const fallbackText = `# ${transformType.toUpperCase()}: LeeWay Project Synthesis
-[Source 1: LeeWay Project Report.pdf, p. 1-2 | Source 2: Integration Plan.docx, p. 3]
-
-## Core Grounded Insights
-- Integration Layer: 92% complete across LibreOffice suite modules [Source 1, p. 2].
-- Workforce Onboarding: Phase 2 currently active with 88% adoption [Source 3, p. 1].
-- Knowledge Base: 42 verified resources actively indexed [Source 1, p. 2].
-- Continuous Veritas Verification attestation verified.`;
-
+      const reason = err instanceof Error ? err.message : String(err);
       setTransformResult({
         transformType,
-        content: fallbackText,
-        veritas,
+        content: `Unavailable: ${reason}. No content was generated. Configure a governed transformation runtime before using this action.`,
+        error: true,
         sourcesUsed: activeSources.map((s) => s.title)
       });
-      // Seamlessly route into the unified system module
-      if (transformType === 'Slide Deck') {
-        setActiveModule('presentations');
-      } else if (transformType === 'Data Table') {
-        setActiveModule('spreadsheets');
-      } else if (transformType === 'Reports' || transformType === 'Summary') {
-        setActiveModule('documents');
-      } else if (transformType === 'Mind Map') {
-        setActiveModule('draw');
-      } else if (transformType === 'Audio Overview' || transformType === 'Flashcards' || transformType === 'Quiz') {
-        setActiveModule('research');
-      }
     } finally {
       setIsGenerating(false);
     }

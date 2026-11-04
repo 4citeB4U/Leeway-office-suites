@@ -36,15 +36,19 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Operations');
-  const [type, setType] = useState<'pdf' | 'docx' | 'md' | 'txt'>('pdf');
+  const [type, setType] = useState<'md' | 'txt'>('txt');
   const [pageCount, setPageCount] = useState(4);
   const [content, setContent] = useState('');
+  const [sourceError, setSourceError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !content.trim()) {
+      setSourceError('Provide actual source text. Empty source records cannot be indexed.');
+      return;
+    }
 
     const newSource: GroundedSource = {
       id: 'src-' + Date.now(),
@@ -53,12 +57,15 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
       pageCount,
       category,
       checked: true,
-      content: content || `${title} content ingested into LeeWay Grounding core.`,
-      summary: `User-ingested document categorized under ${category}.`,
+      content: content.trim(),
+      summary: content.trim().replace(/\s+/g, ' ').slice(0, 240),
       updatedAt: 'Just now'
     };
 
     onAdd(newSource);
+    setSourceError(null);
+    setTitle('');
+    setContent('');
     onClose();
   };
 
@@ -103,8 +110,6 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
                 onChange={(e) => setType(e.target.value as any)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400 cursor-pointer"
               >
-                <option value="pdf">PDF (.pdf)</option>
-                <option value="docx">Word (.docx)</option>
                 <option value="md">Markdown (.md)</option>
                 <option value="txt">Text (.txt)</option>
               </select>
@@ -134,16 +139,44 @@ export const AddSourceModal: React.FC<AddSourceModalProps> = ({
           </div>
 
           <div>
+            <label className="text-slate-300 font-semibold block mb-1">Import real source text (.txt or .md)</label>
+            <input
+              type="file"
+              accept=".txt,.md,text/plain,text/markdown"
+              className="w-full text-slate-200 file:mr-3 file:rounded-lg file:border-0 file:bg-cyan-900 file:px-3 file:py-1 file:text-cyan-100"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                setSourceError(null);
+                try {
+                  if (!/\.(txt|md)$/i.test(file.name)) throw new Error('Only TXT and Markdown parsing is available in this client. PDF and DOCX require a verified parser.');
+                  if (file.size > 2_000_000) throw new Error('Source exceeds the 2 MB browser import limit.');
+                  const text = await file.text();
+                  if (!text.trim()) throw new Error('The selected source contains no text.');
+                  setTitle(file.name.replace(/\.[^.]+$/, ''));
+                  setType(file.name.toLowerCase().endsWith('.md') ? 'md' : 'txt');
+                  setPageCount(Math.max(1, Math.ceil(text.length / 3000)));
+                  setContent(text);
+                } catch (error) {
+                  setSourceError(error instanceof Error ? error.message : 'Unable to read source.');
+                }
+                event.target.value = '';
+              }}
+            />
+          </div>
+          <div>
             <label className="text-slate-300 font-semibold block mb-1">Document Text / Notes Content</label>
             <textarea
               rows={4}
+              required
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste raw source text or key excerpts for token grounding..."
+              placeholder="Paste actual source text or import a TXT/Markdown file. PDF/DOCX parsing is not yet available."
               className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-400 resize-none"
             />
           </div>
 
+          {sourceError && <p role="alert" className="text-amber-300">{sourceError}</p>}
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
             <button
               type="button"

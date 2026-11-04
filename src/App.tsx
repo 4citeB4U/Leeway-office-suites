@@ -118,8 +118,12 @@ export default function App() {
   };
 
   const handleExecuteTransform = (transformType: TransformActionId) => {
+    const activeSources = sources.filter((s) => s.checked && s.content?.trim());
+    if (!activeSources.length) {
+      window.alert('Select at least one source with real text before generating an artifact.');
+      return;
+    }
     setIsGenerating(true);
-    const activeSources = sources.filter((s) => s.checked);
     setTransformResult(createGroundedTransform(transformType, activeSources));
     setIsGenerating(false);
   };

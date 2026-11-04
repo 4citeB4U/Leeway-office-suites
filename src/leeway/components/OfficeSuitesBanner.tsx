@@ -90,9 +90,9 @@ export const OfficeSuitesBanner: React.FC<OfficeSuitesBannerProps> = ({
   ];
 
   return (
-    <div className="relative overflow-visible rounded-xl border border-cyan-500/30 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 py-1.5 shadow-[0_2px_12px_rgba(6,182,212,0.12)] shrink-0 z-30">
+    <div className="agpu-app-header relative overflow-visible rounded-xl border px-4 py-2 shadow-sm shrink-0 z-30">
       {/* Background Futuristic Cyan Energy Wave Graphic */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-40">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-20">
         <svg
           className="absolute right-0 top-1/2 -translate-y-1/2 h-full w-2/3"
           viewBox="0 0 600 60"
@@ -120,23 +120,23 @@ export const OfficeSuitesBanner: React.FC<OfficeSuitesBannerProps> = ({
       <div className="relative z-10 flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
         {/* Left: Brand Identity */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <div className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-cyan-950 to-slate-900 border border-cyan-400/60 shadow-[0_0_12px_rgba(34,211,238,0.4)] shrink-0">
-            <FileText className="w-4 h-4 text-cyan-300" />
+          <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 shadow-sm shrink-0">
+            <FileText className="w-4 h-4 text-blue-700" />
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <h1 className="text-xs sm:text-sm font-bold tracking-tight text-white drop-shadow-sm whitespace-nowrap">
-              LeeWay <span className="text-cyan-400">Office Suites</span>
+            <h1 className="text-sm font-bold tracking-tight text-slate-900 whitespace-nowrap">
+              LeeWay <span className="text-blue-700">Office Suites</span>
             </h1>
-            <div className="hidden lg:flex items-center gap-1.5 text-[10px] font-medium tracking-wide text-slate-300">
+            <div className="hidden lg:flex items-center gap-1.5 text-[10px] font-medium tracking-wide text-slate-500">
               <span>Create</span>
-              <span className="text-cyan-400/60">•</span>
+              <span className="text-slate-300">•</span>
               <span>Edit</span>
-              <span className="text-cyan-400/60">•</span>
+              <span className="text-slate-300">•</span>
               <span>Research</span>
-              <span className="text-cyan-400/60">•</span>
+              <span className="text-slate-300">•</span>
               <span>Analyze</span>
-              <span className="text-cyan-400/60">•</span>
+              <span className="text-slate-300">•</span>
               <span>Present</span>
             </div>
           </div>
@@ -145,7 +145,7 @@ export const OfficeSuitesBanner: React.FC<OfficeSuitesBannerProps> = ({
         {/* Right: The Moved Tool Section (Pointer, Hand, Highlighter, Pen, Sticky Note, Text, Crop, Zoom, Tools Button) */}
         <div className="flex items-center gap-1 sm:gap-1.5 ml-auto overflow-x-auto py-0.5">
           {/* Active Toolstrip */}
-          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800/90 shadow-inner">
+          <div className="agpu-toolstrip flex items-center gap-0.5 sm:gap-1 px-1.5 py-1 rounded-lg border shadow-inner">
             {/* 1. Pointer / Selection Tool */}
             <button
               onClick={() => onSelectTool('select')}
@@ -327,7 +327,7 @@ export const OfficeSuitesBanner: React.FC<OfficeSuitesBannerProps> = ({
           {/* Master "Tools" Button: Fulfills all parts of the presentation, spreadsheets, documents, drawing, research */}
           <button
             onClick={onOpenMasterTools}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950 via-blue-950 to-cyan-950 hover:from-cyan-900 hover:to-blue-900 border border-cyan-400/60 hover:border-cyan-300 text-cyan-300 hover:text-white text-xs font-bold transition-all shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_18px_rgba(34,211,238,0.5)] cursor-pointer shrink-0"
+            className="agpu-tools-button flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 border border-blue-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer shrink-0"
             title="Open Complete Suite Tools Palette"
           >
             <Wrench className="w-3.5 h-3.5 text-cyan-300" />

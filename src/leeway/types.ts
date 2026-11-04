@@ -100,6 +100,7 @@ export interface AnnotationItem {
 export interface TransformResult {
   transformType: string;
   content: string;
-  veritas: VeritasReceipt;
+  veritas?: VeritasReceipt;
+  error?: boolean;
   sourcesUsed: string[];
 }

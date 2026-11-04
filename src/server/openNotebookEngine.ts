@@ -17,9 +17,9 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * Open Notebook Grounded Engine
- * Self-hosted NotebookLM alternative architecture.
+ * LeeWay-governed, self-hosted source retrieval architecture.
  * Implements document chunking, semantic retrieval, strict citation grounding,
- * and NotebookLM-style Deep-Dive Audio Overview Podcast generation.
+ * and local Deep-Dive Audio Overview generation.
  * Governed by LeeWay Standards (https://github.com/4citeB4U/LeeWay-Standards)
  */
 
@@ -140,7 +140,7 @@ export class OpenNotebookEngine {
   }
 
   /**
-   * Generate NotebookLM-Style Deep Dive Audio Overview Podcast Episode
+   * Generate LeeWay Deep Dive Audio Overview Episode
    * Two AI co-hosts (Alex and Morgan) unpack and debate the sources in depth!
    */
   public async generateAudioOverview(

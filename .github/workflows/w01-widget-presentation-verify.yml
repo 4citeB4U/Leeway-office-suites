@@ -1,0 +1,43 @@
+# LEEWAY HEADER — DO NOT REMOVE
+# REGION: LEEWAY.OFFICE.CI.WIDGET_PRESENTATION
+# TAG: LEEWAY.W01.OFFICE.WIDGET_PRESENTATION_GATE
+# 5WH: WHAT=Check the original Office capability-only embedded presentation.
+# WHY=Prevent nested tablet docks and viewport regressions in native-widget views.
+# WHO=Creator-directed W01; WHERE=.github/workflows/w01-widget-presentation-verify.yml.
+# WHEN=2026-11-17; HOW=TypeScript checks, bounded presentation tests, Vite build.
+# AUTHORITY=Source CI only; not physical Windows widget, independent Veritas, or deployment.
+# LICENSE=Apache-2.0
+
+name: W01 Office embedded widget gate
+
+on:
+  pull_request:
+    paths:
+      - 'src/App.tsx'
+      - 'src/leeway/components/TabletFrame.tsx'
+      - 'src/leeway/presentationMode.ts'
+      - 'src/index.css'
+      - 'package.json'
+      - 'tests/presentation-mode.test.mjs'
+      - '.github/workflows/w01-widget-presentation-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install source dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check TypeScript
+        run: npm run lint
+      - name: Check Office standalone and widget mode
+        run: npm run test:embedded
+      - name: Build Office application
+        run: npm run build

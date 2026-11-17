@@ -56,8 +56,12 @@ import {
 } from './leeway/types';
 import { INITIAL_SOURCES } from './leeway/data/defaultSources';
 import { createGroundedTransform } from './leeway/groundedTransforms';
+import { resolveOfficePresentationMode } from './leeway/presentationMode';
 
 export default function App() {
+  // Window chrome belongs to the native widget/tablet host, never the Office capability view.
+  const embeddedSurface = typeof window !== 'undefined' &&
+    resolveOfficePresentationMode(window.location.search, window.self !== window.top) === 'embedded';
   const [activeModule, setActiveModule] = useState<SuiteModuleId>('pdf');
   const [activeDockTab, setActiveDockTab] = useState<SystemDockId>('office');
   const [sources, setSources] = useState<GroundedSource[]>(() => {
@@ -134,7 +138,7 @@ export default function App() {
   };
 
   return (
-    <TabletFrame>
+    <TabletFrame embedded={embeddedSurface}>
       {/* Main App Container */}
       <div className="agpu-workspace flex-1 flex flex-col p-4 gap-3 overflow-hidden min-h-0">
         {/* Banner: LeeWay Office Suites with Top-Right Tool Section */}
@@ -221,8 +225,9 @@ export default function App() {
         </div>
       </div>
 
-      {/* 3. Bottom system dock — shared workstation navigation */}
-      <SystemDock
+      {/* Global navigation belongs to the standalone Office shell, never a tablet/widget surface. */}
+      {!embeddedSurface && (
+        <SystemDock
         activeDockTab={activeDockTab}
         onSelectDockTab={(tab) => {
           setActiveDockTab(tab);
@@ -234,7 +239,8 @@ export default function App() {
         }}
         onOpenContinuum={() => setIsContinuumOpen(true)}
         onOpenDiagnostics={() => setIsDiagnosticsOpen(true)}
-      />
+        />
+      )}
 
       {/* Interactive Modals */}
       <TransformResultModal

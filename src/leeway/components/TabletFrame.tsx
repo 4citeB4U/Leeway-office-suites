@@ -25,11 +25,15 @@ import { AppWindow, LockKeyhole, Minus, Square, X } from 'lucide-react';
 
 interface TabletFrameProps {
   children: React.ReactNode;
+  embedded?: boolean;
 }
 
-export const TabletFrame: React.FC<TabletFrameProps> = ({ children }) => {
+export const TabletFrame: React.FC<TabletFrameProps> = ({ children, embedded = false }) => {
   return (
-    <div className="agpu-desktop relative w-screen h-screen overflow-hidden text-slate-800 flex flex-col select-none">
+    <div className={embedded
+      ? "agpu-desktop relative w-full h-full min-w-0 min-h-0 overflow-hidden text-slate-800 flex flex-col select-none"
+      : "agpu-desktop relative w-screen h-screen overflow-hidden text-slate-800 flex flex-col select-none"}>
+      {!embedded && (
       <div className="agpu-window-bar flex h-9 shrink-0 items-center justify-between border-b px-4">
         <div className="flex items-center gap-3">
           <div className="agpu-window-controls flex items-center gap-1.5" aria-label="Window controls">
@@ -52,6 +56,7 @@ export const TabletFrame: React.FC<TabletFrameProps> = ({ children }) => {
           </div>
         </div>
       </div>
+      )}
       <div className="agpu-window-content flex min-h-0 flex-1 flex-col">
         {children}
       </div>

@@ -14,7 +14,11 @@
       "WHEN": "2026-11-04 standards audit.",
       "HOW": "Use package-manager-compatible JSON metadata and scripts."
     },
-    "agents": ["ASSESS", "ALIGN", "AUDIT"],
+    "agents": [
+      "ASSESS",
+      "ALIGN",
+      "AUDIT"
+    ],
     "license": "Apache-2.0"
   },
   "scripts": {
@@ -23,7 +27,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:embedded": "node --import tsx --test tests/presentation-mode.test.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
